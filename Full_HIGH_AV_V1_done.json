@@ -1,0 +1,1883 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "adminUsername": {
+		    "defaultValue": "accopsadmin",
+            "type": "String",
+            "metadata": {
+                "description": "Admin username"
+            }
+        },
+        "adminPassword": {
+            "type": "SecureString",
+            "metadata": {
+                "description": "Admin password"
+            }
+        },
+		/* HySecure Web Node which will be serving the End User Request */
+		
+		"HysecureWebFrontendVMPrefix": {
+            "defaultValue": "HysecureWebNode-",
+            "type": "String",
+            "metadata": {
+                "description": "Prefix to use for HySecure Web Frontend VM names"
+            }
+        },
+		"numberOfHysecureWebFrontendInstances": {
+            "type": "int",
+            "metadata": {
+                "description": "Number of HySecure Web Frontend Node Servers"
+            },
+            "allowedValues": [
+                1,
+                2,
+				3,
+				4,
+				5,
+				6,
+				7,
+				8,
+				9,
+				10
+            ],
+            "defaultValue": 2
+        },
+		"HSWvmSize": {
+            "type": "string",
+            "defaultValue": "Standard_B2s",
+			"allowedValues": [
+                "Standard_D2s_v3",
+                "Standard_B2s"
+            ],
+            "metadata": {
+             "description": "Size of the HySecure Web Frontend Node Servers"
+            }
+        },	
+
+		/* HySecure Management Node which will be used for Management of cluster and All the Rules configurations */
+		
+        "HysecureManagementVMNamePrefix": {
+            "defaultValue": "HySecureMgmtNode-",
+            "type": "String",
+            "metadata": {
+                "description": "Prefix to use for HySecure Management VM names"
+            }
+        },
+	    "numberOfHysecureManagementInstances": {
+            "type": "int",
+            "metadata": {
+                "description": "Number of HySecure Management Node Servers"
+            },
+            "allowedValues": [
+                1,
+                2
+            ],
+            "defaultValue": 2
+        },
+		"HSMvmSize": {
+            "type": "string",
+            "defaultValue": "Standard_B2s",
+			"allowedValues": [
+                "Standard_D2s_v3",
+                "Standard_B2s"
+            ],
+            "metadata": {
+             "description": "Size of the HySecure Management Node Servers"
+            }
+        },
+		
+		/* Domain Controller Nodes */
+		
+		"DomainControllerVMPrefix": {
+            "defaultValue": "HQDCVM-",
+            "type": "String",
+            "metadata": {
+                "description": "Prefix to use for Domain Controller VM names"
+            }
+        },
+	   "numberOfADDCInstances": {
+            "type": "int",
+            "metadata": {
+                "description": "Number of Domain Controller Node Servers"
+            },
+            "allowedValues": [
+                1,
+                2
+            ],
+            "defaultValue": 1
+        },
+		"ADDCvmSize": {
+            "type": "string",
+            "defaultValue": "Standard_B2s",
+			"allowedValues": [
+                "Standard_DS1",
+                "Standard_B2s"
+            ],
+            "metadata": {
+             "description": "Size of the Domain Controller Node"
+            }
+        },		
+		
+		
+	    /* SQL */
+		
+		"SQLVMPrefix": {
+            "defaultValue": "SQL-",
+            "type": "String",
+            "metadata": {
+                "description": "Prefix to use for SQL VM names"
+            }
+        },
+	   "numberOfSQLInstances": {
+            "type": "int",
+            "metadata": {
+                "description": "Number of SQL Node Servers"
+            },
+            "allowedValues": [
+                1,
+                2
+            ],
+            "defaultValue": 1
+        },
+		"SQLvmSize": {
+            "type": "string",
+            "defaultValue": "Standard_B2s",
+			"allowedValues": [
+                "Standard_DS1",
+                "Standard_B2s"
+            ],
+            "metadata": {
+             "description": "Size of the SQL Node"
+            }
+        },		
+		
+			    /* SQL */
+		
+		"SQLWitnessVMPrefix": {
+            "defaultValue": "SQLW-",
+            "type": "String",
+            "metadata": {
+                "description": "Prefix to use for SQL Witness VM names"
+            }
+        },/*
+	   "numberOfSQLWInstances": {
+            "type": "int",
+            "metadata": {
+                "description": "Number of SQL Witness Node Servers"
+            },
+            "allowedValues": [
+                1,
+                2
+            ],
+            "defaultValue": 1
+        },*/
+		"SQLWitnessvmSize": {
+            "type": "string",
+            "defaultValue": "Standard_B2s",
+			"allowedValues": [
+                "Standard_DS1",
+                "Standard_B2s"
+            ],
+            "metadata": {
+             "description": "Size of the SQL Witness Node"
+            }
+        },	
+		
+		/* HyWorks Management Nodes */
+				
+		"HyworksManagementVMPrefix": {
+            "defaultValue": "HWMNode-",
+            "type": "String",
+            "metadata": {
+                "description": "Prefix to use for HyWorks Management VM names"
+            }
+        },
+	    "numberOfHyworksManagementInstances": {
+            "type": "int",
+            "metadata": {
+                "description": "Number of HyWorks Management Node Servers"
+            },
+            "allowedValues": [
+                1,
+                2
+            ],
+            "defaultValue": 2
+        },
+		"HWMvmSize": {
+            "type": "string",
+            "defaultValue": "Standard_B2s",
+			"allowedValues": [
+                "Standard_D2s_v3",
+                "Standard_B2s"
+            ],
+            "metadata": {
+             "description": "Size of the HyWorks Management Node Servers"
+            }
+        },
+		
+		/* HyWorks Session Nodes */
+		
+		"HyworksSessionVMPrefix": {
+            "defaultValue": "HWSNode-",
+            "type": "String",
+            "metadata": {
+                "description": "Prefix to use for HySecure Session VM names"
+            }
+        },
+	   "numberOfHyworksSessionInstances": {
+            "type": "int",
+            "metadata": {
+                "description": "Number of HyWorks Session Node Servers"
+            },
+            "allowedValues": [
+                1,
+                2,
+				3,
+				4,
+				5,
+				6
+            ],
+            "defaultValue": 2
+        },
+		"HWSvmSize": {
+            "type": "string",
+            "defaultValue": "Standard_DS1",
+			"allowedValues": [
+                "Standard_DS1",
+                "Standard_B2s"
+            ],
+            "metadata": {
+             "description": "Size of the HyWorks Management Node Servers"
+            }
+        },
+		/* Gold VM */
+		
+		"WindowsDedicatedGoldVMPrefix": {
+            "defaultValue": "WVDVM",
+            "type": "String",
+            "metadata": {
+                "description": "Prefix to use for VM names"
+            }
+        },
+		"numberOfWindowsDedicatedGoldInstances": {
+            "type": "int",
+            "metadata": {
+                "description": "Number of Windows Dedicated Gold VMs"
+            },
+            "allowedValues": [
+                1,
+                2
+            ],
+            "defaultValue": 1
+        },
+		"GoldWinvmSize": {
+            "type": "string",
+            "defaultValue": "Standard_B2s",
+			"allowedValues": [
+                "Standard_D2s_v3",
+                "Standard_B2s"
+            ],
+            "metadata": {
+             "description": "Size of the Windows Dedicated Gold VMs"
+            }
+        },
+		
+		/* Jump Box*/
+		
+		"WindowsJumpBoxVMPrefix": {
+            "defaultValue": "JumpBoxVM",
+            "type": "String",
+            "metadata": {
+                "description": "Prefix to use for Jump Box VM names"
+            }
+        },
+		"numberOfJumpBoxInstances": {
+            "type": "int",
+            "metadata": {
+                "description": "Number of Windows Jump Box VMs"
+            },
+            "allowedValues": [
+                1,
+                2
+            ],
+            "defaultValue": 1
+        },
+		"JumpBoxvmSize": {
+            "type": "string",
+            "defaultValue": "Standard_B2s",
+			"allowedValues": [
+                "Standard_D2s_v3",
+                "Standard_B2s"
+            ],
+            "metadata": {
+             "description": "Size of the Windows Dedicated Gold VMs"
+            }
+        },
+		
+		"osDiskType": {
+            "type": "string",
+			"defaultValue": "Standard_LRS"
+        },
+        "_artifactsLocation": {
+            "type": "string",
+            "defaultValue": "[deployment().properties.templateLink.uri]",
+            "metadata": {
+                  "description": "The base URI where artifacts required by this template are located including a trailing '/'"
+                 }
+        },
+        "_artifactsLocationSasToken": {
+            "type": "securestring",
+                 "defaultValue": "",
+                 "metadata": {
+                   "description": "The sasToken required to access _artifactsLocation.  When the template is deployed using the accompanying scripts, a sasToken will be automatically generated. Use the defaultValue if the staging location is not secured."
+                 }
+        },
+        "location": {
+            "type": "string",
+                 "defaultValue": "[resourceGroup().location]",
+                 "metadata": {
+                      "description": "Location for all resources."
+                }
+        },
+        /*
+        "vmSize": {
+            "defaultValue": "Standard_F2s_v2",
+            "type": "String",
+			"allowedValues": [
+			    "Standard_F2s_v2",
+				"Standard_F4s_v2",
+				"Standard_F8s_v2",
+                "Standard_DS1",
+                "Standard_DS2",
+                "Standard_DS3",
+                "Standard_DS4",
+                "Standard_DS11",
+                "Standard_DS12",
+                "Standard_DS13",
+                "Standard_DS14"
+            ],
+            "metadata": {
+                "description": "Size of the virtual machines"
+            }
+        },*/
+		"patchMode": {
+            "type": "string",
+			"defaultValue": "AutomaticByOS"
+        }
+    },	
+    "variables": {
+        "availabilitySet1Name": "AvSetHySecureWeb",
+		"availabilitySet2Name": "AvSetHySecureManagement",
+		"availabilitySet3Name": "AvSetHyWorksManagement",
+		"availabilitySet4Name": "AvSetHyWorksSession",
+		"availabilitySet5Name": "AvSetWVD",
+		"availabilitySet6Name": "AvSetJumpBox",
+		"availabilitySet7Name": "AvSetDC",
+		"availabilitySet8Name": "AvSetSQL",
+        "storageAccountType": "Standard_LRS",
+        "storageAccountName": "[uniqueString(resourceGroup().id)]",
+        "virtualNetworkName": "Appliance-VNet",
+        "subnet1Name": "HySecureWeb-Subnet",
+		"subnet2Name": "HySecureMgmt-Subnet",
+		"subnet3Name": "HyWorksMgmt-Subnet",
+		"subnet4Name": "HyWorksSession-Subnet",
+		"subnet5Name": "VDI-Subnet",
+		"subnet6Name": "JumpBox-Subnet",
+		"subnet7Name": "ADDC-Subnet",
+		"subnet8Name": "SQL-Subnet",
+        "loadBalancer2Name": "Intlb",
+		"publicIPAddressName": "PubliclbIP",
+		"loadBalancer1Name": "Extlb",
+        "networkInterface1Name": "HSWebNodeNic",
+		"networkInterface2Name": "HSMgmtNodeNic",
+		"networkInterface3Name": "HWMgmtNodeNic",
+		"networkInterface4Name": "HWSessionNodeNic",
+		"networkInterface5Name": "WVDNodeNic",
+		"networkInterface6Name": "JumpBoxNodeNic",
+		"networkInterface7Name": "ADDCNodeNic",
+		"networkInterface8Name": "SQLNodeNic",
+		"subnet1Ref": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('virtualNetworkName'), variables('subnet1Name'))]",
+        "subnet2Ref": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('virtualNetworkName'), variables('subnet2Name'))]",
+		"subnet3Ref": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('virtualNetworkName'), variables('subnet3Name'))]",
+		"subnet4Ref": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('virtualNetworkName'), variables('subnet4Name'))]",
+		"subnet5Ref": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('virtualNetworkName'), variables('subnet5Name'))]",
+		"subnet6Ref": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('virtualNetworkName'), variables('subnet6Name'))]",
+		"subnet7Ref": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('virtualNetworkName'), variables('subnet7Name'))]",
+		"subnet8Ref": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('virtualNetworkName'), variables('subnet8Name'))]",
+		"networkSecurityGroup1Name": "HS-WEB-NSG",
+		"networkSecurityGroup2Name": "HS-MGMT-NSG",
+		"networkSecurityGroup3Name": "HW-MGMT-NSG",
+		"networkSecurityGroup4Name": "HW-SESSION-NSG",
+		"networkSecurityGroup5Name": "GOLD-VM-NSG",
+		"networkSecurityGroup6Name": "JumpBox-NSG",
+		"networkSecurityGroup7Name": "ADDC-NSG",
+		"networkSecurityGroup8Name": "SQL-NSG"
+        /*"numberOfInstances": 2 */
+    },
+    "resources": [
+        {
+            "type": "Microsoft.Storage/storageAccounts",
+            "apiVersion": "2019-06-01",
+            "name": "[variables('storageAccountName')]",
+            "location": "[parameters('location')]",
+            "sku": {
+                "name": "[variables('storageAccountType')]"
+            },
+            "kind": "StorageV2"
+        },
+        {
+            "type": "Microsoft.Compute/availabilitySets",
+            "apiVersion": "2020-06-01",
+            "name": "[variables('availabilitySet1Name')]",
+            "location": "[parameters('location')]",
+            "sku": {
+                "name": "Aligned"
+            },
+            "properties": {
+                "PlatformUpdateDomainCount": 2,
+                "PlatformFaultDomainCount": 2
+            }
+        },
+		{
+            "type": "Microsoft.Compute/availabilitySets",
+            "apiVersion": "2020-06-01",
+            "name": "[variables('availabilitySet2Name')]",
+            "location": "[parameters('location')]",
+            "sku": {
+                "name": "Aligned"
+            },
+            "properties": {
+                "PlatformUpdateDomainCount": 2,
+                "PlatformFaultDomainCount": 2
+            }
+        },
+				        {
+            "type": "Microsoft.Compute/availabilitySets",
+            "apiVersion": "2020-06-01",
+            "name": "[variables('availabilitySet3Name')]",
+            "location": "[parameters('location')]",
+            "sku": {
+                "name": "Aligned"
+            },
+            "properties": {
+                "PlatformUpdateDomainCount": 2,
+                "PlatformFaultDomainCount": 2
+            }
+        },
+				        {
+            "type": "Microsoft.Compute/availabilitySets",
+            "apiVersion": "2020-06-01",
+            "name": "[variables('availabilitySet4Name')]",
+            "location": "[parameters('location')]",
+            "sku": {
+                "name": "Aligned"
+            },
+            "properties": {
+                "PlatformUpdateDomainCount": 2,
+                "PlatformFaultDomainCount": 2
+            }
+        },
+		
+		{
+            "type": "Microsoft.Compute/availabilitySets",
+            "apiVersion": "2020-06-01",
+            "name": "[variables('availabilitySet5Name')]",
+            "location": "[parameters('location')]",
+            "sku": {
+                "name": "Aligned"
+            },
+            "properties": {
+                "PlatformUpdateDomainCount": 2,
+                "PlatformFaultDomainCount": 2
+            }
+        },
+				{
+            "type": "Microsoft.Compute/availabilitySets",
+            "apiVersion": "2020-06-01",
+            "name": "[variables('availabilitySet6Name')]",
+            "location": "[parameters('location')]",
+            "sku": {
+                "name": "Aligned"
+            },
+            "properties": {
+                "PlatformUpdateDomainCount": 2,
+                "PlatformFaultDomainCount": 2
+            }
+        },
+				{
+            "type": "Microsoft.Compute/availabilitySets",
+            "apiVersion": "2020-06-01",
+            "name": "[variables('availabilitySet7Name')]",
+            "location": "[parameters('location')]",
+            "sku": {
+                "name": "Aligned"
+            },
+            "properties": {
+                "PlatformUpdateDomainCount": 2,
+                "PlatformFaultDomainCount": 2
+            }
+        },
+				{
+            "type": "Microsoft.Compute/availabilitySets",
+            "apiVersion": "2020-06-01",
+            "name": "[variables('availabilitySet8Name')]",
+            "location": "[parameters('location')]",
+            "sku": {
+                "name": "Aligned"
+            },
+            "properties": {
+                "PlatformUpdateDomainCount": 2,
+                "PlatformFaultDomainCount": 2
+            }
+        },
+		
+		{
+			"comments": "Default Network Security Group for template",
+			"type": "Microsoft.Network/networkSecurityGroups",
+			"apiVersion": "2020-05-01",
+			"name": "[variables('networkSecurityGroup1Name')]",
+			"location": "[parameters('location')]",
+			"properties": {
+				"securityRules": [
+				{
+					"name": "Endpoint-HTTPS-443",
+					"properties": {
+					"priority": 1000,
+					"access": "Allow",
+					"direction": "Inbound",
+					"destinationPortRange": "443",
+					"protocol": "Tcp",
+					"sourceAddressPrefix": "*",
+					"sourcePortRange": "*",
+					"destinationAddressPrefix": "*"
+						}
+					}
+				]
+			}
+		},
+				{
+			"comments": "Default Network Security Group for template",
+			"type": "Microsoft.Network/networkSecurityGroups",
+			"apiVersion": "2020-05-01",
+			"name": "[variables('networkSecurityGroup2Name')]",
+			"location": "[parameters('location')]",
+			"properties": {
+				"securityRules": [
+				{
+					"name": "default-allow-all",
+					"properties": {
+					"priority": 1000,
+					"access": "Allow",
+					"direction": "Inbound",
+					"destinationPortRange": "*",
+					"protocol": "Tcp",
+					"sourceAddressPrefix": "*",
+					"sourcePortRange": "*",
+					"destinationAddressPrefix": "*"
+						}
+					}
+				]
+			}
+		},
+						{
+			"comments": "Default Network Security Group for template",
+			"type": "Microsoft.Network/networkSecurityGroups",
+			"apiVersion": "2020-05-01",
+			"name": "[variables('networkSecurityGroup3Name')]",
+			"location": "[parameters('location')]",
+			"properties": {
+				"securityRules": [
+				{
+					"name": "default-allow-RDP",
+					"properties": {
+					"priority": 1000,
+					"access": "Allow",
+					"direction": "Inbound",
+					"destinationPortRange": "3389",
+					"protocol": "Tcp",
+					"sourceAddressPrefix": "*",
+					"sourcePortRange": "*",
+					"destinationAddressPrefix": "*"
+						}
+					}
+				]
+			}
+		},
+		{
+			"comments": "Default Network Security Group for template",
+			"type": "Microsoft.Network/networkSecurityGroups",
+			"apiVersion": "2020-05-01",
+			"name": "[variables('networkSecurityGroup4Name')]",
+			"location": "[parameters('location')]",
+			"properties": {
+				"securityRules": [
+				{
+					"name": "default-allow-RDP",
+					"properties": {
+					"priority": 1000,
+					"access": "Allow",
+					"direction": "Inbound",
+					"destinationPortRange": "3389",
+					"protocol": "Tcp",
+					"sourceAddressPrefix": "*",
+					"sourcePortRange": "*",
+					"destinationAddressPrefix": "*"
+						}
+					}
+				]
+			}
+		},
+				{
+			"comments": "Default Network Security Group for template",
+			"type": "Microsoft.Network/networkSecurityGroups",
+			"apiVersion": "2020-05-01",
+			"name": "[variables('networkSecurityGroup5Name')]",
+			"location": "[parameters('location')]",
+			"properties": {
+				"securityRules": [
+				{
+					"name": "default-allow-RDP",
+					"properties": {
+					"priority": 1000,
+					"access": "Allow",
+					"direction": "Inbound",
+					"destinationPortRange": "3389",
+					"protocol": "Tcp",
+					"sourceAddressPrefix": "*",
+					"sourcePortRange": "*",
+					"destinationAddressPrefix": "*"
+						}
+					}
+				]
+			}
+		},
+				{
+			"comments": "Default Network Security Group for template",
+			"type": "Microsoft.Network/networkSecurityGroups",
+			"apiVersion": "2020-05-01",
+			"name": "[variables('networkSecurityGroup6Name')]",
+			"location": "[parameters('location')]",
+			"properties": {
+				"securityRules": [
+				{
+					"name": "default-allow-RDP",
+					"properties": {
+					"priority": 1000,
+					"access": "Allow",
+					"direction": "Inbound",
+					"destinationPortRange": "3389",
+					"protocol": "Tcp",
+					"sourceAddressPrefix": "*",
+					"sourcePortRange": "*",
+					"destinationAddressPrefix": "*"
+						}
+					}
+				]
+			}
+		},
+				{
+			"comments": "Default Network Security Group for template",
+			"type": "Microsoft.Network/networkSecurityGroups",
+			"apiVersion": "2020-05-01",
+			"name": "[variables('networkSecurityGroup7Name')]",
+			"location": "[parameters('location')]",
+			"properties": {
+				"securityRules": [
+				{
+					"name": "default-allow-RDP",
+					"properties": {
+					"priority": 1000,
+					"access": "Allow",
+					"direction": "Inbound",
+					"destinationPortRange": "3389",
+					"protocol": "Tcp",
+					"sourceAddressPrefix": "*",
+					"sourcePortRange": "*",
+					"destinationAddressPrefix": "*"
+						}
+					}
+				]
+			}
+		},
+				{
+			"comments": "Default Network Security Group for template",
+			"type": "Microsoft.Network/networkSecurityGroups",
+			"apiVersion": "2020-05-01",
+			"name": "[variables('networkSecurityGroup8Name')]",
+			"location": "[parameters('location')]",
+			"properties": {
+				"securityRules": [
+				{
+					"name": "default-allow-RDP",
+					"properties": {
+					"priority": 1000,
+					"access": "Allow",
+					"direction": "Inbound",
+					"destinationPortRange": "3389",
+					"protocol": "Tcp",
+					"sourceAddressPrefix": "*",
+					"sourcePortRange": "*",
+					"destinationAddressPrefix": "*"
+						}
+					}
+				]
+			}
+		},
+        {
+            "type": "Microsoft.Network/virtualNetworks",
+            "apiVersion": "2020-06-01",
+            "name": "[variables('virtualNetworkName')]",
+            "location": "[parameters('location')]",
+			"dependsOn": [
+				"[resourceId('Microsoft.Network/networkSecurityGroups', variables('networkSecurityGroup1Name'))]",
+				"[resourceId('Microsoft.Network/networkSecurityGroups', variables('networkSecurityGroup2Name'))]",
+				"[resourceId('Microsoft.Network/networkSecurityGroups', variables('networkSecurityGroup3Name'))]",
+				"[resourceId('Microsoft.Network/networkSecurityGroups', variables('networkSecurityGroup4Name'))]",
+				"[resourceId('Microsoft.Network/networkSecurityGroups', variables('networkSecurityGroup5Name'))]",
+				"[resourceId('Microsoft.Network/networkSecurityGroups', variables('networkSecurityGroup6Name'))]",
+				"[resourceId('Microsoft.Network/networkSecurityGroups', variables('networkSecurityGroup7Name'))]",
+				"[resourceId('Microsoft.Network/networkSecurityGroups', variables('networkSecurityGroup8Name'))]"
+			],
+            "properties": {
+                "addressSpace": {
+                    "addressPrefixes": [
+                        "172.16.16.0/24"
+                    ]
+                },
+                "subnets": [
+                    {
+                        "name": "[variables('subnet1Name')]",
+                        "properties": {
+                            "addressPrefix": "172.16.16.0/28",
+							"networkSecurityGroup": {
+								"id": "[resourceId('Microsoft.Network/networkSecurityGroups', variables('networkSecurityGroup1Name'))]"
+								}
+                        }
+                    },
+					                    {
+                        "name": "[variables('subnet2Name')]",
+                        "properties": {
+                            "addressPrefix": "172.16.16.16/28",
+							"networkSecurityGroup": {
+								"id": "[resourceId('Microsoft.Network/networkSecurityGroups', variables('networkSecurityGroup2Name'))]"
+								}
+                        }
+                    },
+					                    {
+                        "name": "[variables('subnet3Name')]",
+                        "properties": {
+                            "addressPrefix": "172.16.16.32/28",
+							"networkSecurityGroup": {
+								"id": "[resourceId('Microsoft.Network/networkSecurityGroups', variables('networkSecurityGroup3Name'))]"
+								}
+                        }
+                    },
+					{
+                        "name": "[variables('subnet4Name')]",
+                        "properties": {
+                            "addressPrefix": "172.16.16.64/28",
+							"networkSecurityGroup": {
+								"id": "[resourceId('Microsoft.Network/networkSecurityGroups', variables('networkSecurityGroup4Name'))]"
+								}
+                        }
+                    },
+										{
+                        "name": "[variables('subnet5Name')]",
+                        "properties": {
+                            "addressPrefix": "172.16.16.96/28",
+							"networkSecurityGroup": {
+								"id": "[resourceId('Microsoft.Network/networkSecurityGroups', variables('networkSecurityGroup5Name'))]"
+								}
+                        }
+                    },
+										{
+                        "name": "[variables('subnet6Name')]",
+                        "properties": {
+                            "addressPrefix": "172.16.16.128/28",
+							"networkSecurityGroup": {
+								"id": "[resourceId('Microsoft.Network/networkSecurityGroups', variables('networkSecurityGroup6Name'))]"
+								}
+                        }
+                    },
+										{
+                        "name": "[variables('subnet7Name')]",
+                        "properties": {
+                            "addressPrefix": "172.16.16.160/28",
+							"networkSecurityGroup": {
+								"id": "[resourceId('Microsoft.Network/networkSecurityGroups', variables('networkSecurityGroup7Name'))]"
+								}
+                        }
+                    },
+
+									{
+                        "name": "[variables('subnet8Name')]",
+                        "properties": {
+                            "addressPrefix": "172.16.16.192/28",
+							"networkSecurityGroup": {
+								"id": "[resourceId('Microsoft.Network/networkSecurityGroups', variables('networkSecurityGroup8Name'))]"
+								}
+                        }
+                    }
+                ]
+            }
+        },
+		{
+			"apiVersion": "2020-08-01",
+			"type": "Microsoft.Network/publicIPAddresses",
+			"name": "[variables('publicIPAddressName')]",
+			"location": "[parameters('location')]",
+			"sku": {
+                "name": "Standard"
+            },
+			"properties": {
+			"publicIPAddressVersion": "IPv4",
+			"publicIPAllocationMethod": "Static"
+		/*	"dnsSettings": { */
+		/*	"domainNameLabel": "[parameters('dnsNameforLBIP')]" */
+		/*				} */
+				}
+		},
+        {
+            "type": "Microsoft.Network/networkInterfaces",
+            "apiVersion": "2020-06-01",
+            "name": "[concat(variables('networkInterface1Name'), copyindex())]",
+            "location": "[parameters('location')]",
+            "dependsOn": [
+                "[variables('virtualNetworkName')]",
+                "[variables('loadBalancer1Name')]"
+            ],
+            "properties": {
+			/*    "primary": true, */
+			/*	"enableAcceleratedNetworking": true, */
+                "ipConfigurations": [
+                    {
+                        "name": "ipconfig1",
+                        "properties": {
+                            "privateIPAllocationMethod": "Dynamic",
+                            "subnet": {
+                                "id": "[variables('subnet1Ref')]"
+                            },
+                            "loadBalancerBackendAddressPools": [
+                                {
+                                    "id": "[resourceId('Microsoft.Network/loadBalancers/backendAddressPools', variables('loadBalancer1Name'), 'BackendPool1')]"
+                                }
+                            ]
+                        }
+                    }
+                ]
+            },
+            "copy": {
+                "name": "nicLoop",
+                "count": "[parameters('numberOfHysecureWebFrontendInstances')]"
+            }
+        },
+		{
+            "type": "Microsoft.Network/networkInterfaces",
+            "apiVersion": "2020-06-01",
+            "name": "[concat(variables('networkInterface2Name'), copyindex())]",
+            "location": "[parameters('location')]",
+            "dependsOn": [
+                "[variables('virtualNetworkName')]",
+                "[variables('loadBalancer2Name')]"
+            ],
+            "properties": {
+                "ipConfigurations": [
+                    {
+                        "name": "ipconfig1",
+                        "properties": {
+                            "privateIPAllocationMethod": "Dynamic",
+                            "subnet": {
+                                "id": "[variables('subnet2Ref')]"
+                            },
+                            "loadBalancerBackendAddressPools": [
+                                {
+                                    "id": "[resourceId('Microsoft.Network/loadBalancers/backendAddressPools', variables('loadBalancer2Name'), 'BackendPool2')]"
+                                }
+                            ]
+                        }
+                    }
+                ]
+            },
+            "copy": {
+                "name": "nicLoop",
+                "count": "[parameters('numberOfHysecureManagementInstances')]"
+            }
+        },
+				{
+            "type": "Microsoft.Network/networkInterfaces",
+            "apiVersion": "2020-06-01",
+            "name": "[concat(variables('networkInterface3Name'), copyindex())]",
+            "location": "[parameters('location')]",
+            "dependsOn": [
+                "[variables('virtualNetworkName')]"
+       /*         "[variables('loadBalancer3Name')]" */
+            ],
+            "properties": {
+                "ipConfigurations": [
+                    {
+                        "name": "ipconfig1",
+                        "properties": {
+                            "privateIPAllocationMethod": "Dynamic",
+                            "subnet": {
+                                "id": "[variables('subnet3Ref')]"
+                            }
+                        /*    "loadBalancerBackendAddressPools": [
+                                {
+                                    "id": "[resourceId('Microsoft.Network/loadBalancers/backendAddressPools', variables('loadBalancer3Name'), 'BackendPool3')]"
+                                }
+                            ]*/
+                        }
+                    }
+                ]
+            },
+            "copy": {
+                "name": "nicLoop",
+                "count": "[parameters('numberOfHyworksManagementInstances')]"
+            }
+        },
+						{
+            "type": "Microsoft.Network/networkInterfaces",
+            "apiVersion": "2020-06-01",
+            "name": "[concat(variables('networkInterface4Name'), copyindex())]",
+            "location": "[parameters('location')]",
+            "dependsOn": [
+                "[variables('virtualNetworkName')]"
+       /*         "[variables('loadBalancer3Name')]" */
+            ],
+            "properties": {
+                "ipConfigurations": [
+                    {
+                        "name": "ipconfig1",
+                        "properties": {
+                            "privateIPAllocationMethod": "Dynamic",
+                            "subnet": {
+                                "id": "[variables('subnet4Ref')]"
+                            }
+                        /*    "loadBalancerBackendAddressPools": [
+                                {
+                                    "id": "[resourceId('Microsoft.Network/loadBalancers/backendAddressPools', variables('loadBalancer3Name'), 'BackendPool3')]"
+                                }
+                            ]*/
+                        }
+                    }
+                ]
+            },
+            "copy": {
+                "name": "nicLoop",
+                "count": "[parameters('numberOfHyworksSessionInstances')]"
+            }
+        },
+								{
+            "type": "Microsoft.Network/networkInterfaces",
+            "apiVersion": "2020-06-01",
+            "name": "[concat(variables('networkInterface5Name'), copyindex())]",
+            "location": "[parameters('location')]",
+            "dependsOn": [
+                "[variables('virtualNetworkName')]"
+       /*         "[variables('loadBalancer5Name')]" */
+            ],
+            "properties": {
+                "ipConfigurations": [
+                    {
+                        "name": "ipconfig1",
+                        "properties": {
+                            "privateIPAllocationMethod": "Dynamic",
+                            "subnet": {
+                                "id": "[variables('subnet5Ref')]"
+                            }
+                        /*    "loadBalancerBackendAddressPools": [
+                                {
+                                    "id": "[resourceId('Microsoft.Network/loadBalancers/backendAddressPools', variables('loadBalancer5Name'), 'BackendPool5')]"
+                                }
+                            ]*/
+                        }
+                    }
+                ]
+            },
+            "copy": {
+                "name": "nicLoop",
+                "count": "[parameters('numberOfWindowsDedicatedGoldInstances')]"
+            }
+        },
+		/* JUMP BOX INTERFACE*/
+								{
+            "type": "Microsoft.Network/networkInterfaces",
+            "apiVersion": "2020-06-01",
+            "name": "[concat(variables('networkInterface6Name'), copyindex())]",
+            "location": "[parameters('location')]",
+            "dependsOn": [
+                "[variables('virtualNetworkName')]"
+       /*         "[variables('loadBalancer6Name')]" */
+            ],
+            "properties": {
+                "ipConfigurations": [
+                    {
+                        "name": "ipconfig1",
+                        "properties": {
+                            "privateIPAllocationMethod": "Dynamic",
+                            "subnet": {
+                                "id": "[variables('subnet6Ref')]"
+                            }
+                        /*    "loadBalancerBackendAddressPools": [
+                                {
+                                    "id": "[resourceId('Microsoft.Network/loadBalancers/backendAddressPools', variables('loadBalancer6Name'), 'BackendPool6')]"
+                                }
+                            ]*/
+                        }
+                    }
+                ]
+            },
+            "copy": {
+                "name": "nicLoop",
+                "count": "[parameters('numberOfJumpBoxInstances')]"
+            }
+        },
+		
+		/*AD INTERFACE*/
+
+								{
+            "type": "Microsoft.Network/networkInterfaces",
+            "apiVersion": "2020-06-01",
+            "name": "[concat(variables('networkInterface7Name'), copyindex())]",
+            "location": "[parameters('location')]",
+            "dependsOn": [
+                "[variables('virtualNetworkName')]"
+       /*         "[variables('loadBalancer7Name')]" */
+            ],
+            "properties": {
+                "ipConfigurations": [
+                    {
+                        "name": "ipconfig1",
+                        "properties": {
+                            "privateIPAllocationMethod": "Dynamic",
+                            "subnet": {
+                                "id": "[variables('subnet7Ref')]"
+                            }
+                        /*    "loadBalancerBackendAddressPools": [
+                                {
+                                    "id": "[resourceId('Microsoft.Network/loadBalancers/backendAddressPools', variables('loadBalancer7Name'), 'BackendPool7')]"
+                                }
+                            ]*/
+                        }
+                    }
+                ]
+            },
+            "copy": {
+                "name": "nicLoop",
+                "count": "[parameters('numberOfADDCInstances')]"
+            }
+        },
+		
+		/*sql INTERFACE*/
+										{
+            "type": "Microsoft.Network/networkInterfaces",
+            "apiVersion": "2020-06-01",
+            "name": "[concat(variables('networkInterface8Name'), copyindex())]",
+            "location": "[parameters('location')]",
+            "dependsOn": [
+                "[variables('virtualNetworkName')]"
+       /*         "[variables('loadBalancer8Name')]" */
+            ],
+            "properties": {
+                "ipConfigurations": [
+                    {
+                        "name": "ipconfig1",
+                        "properties": {
+                            "privateIPAllocationMethod": "Dynamic",
+                            "subnet": {
+                                "id": "[variables('subnet8Ref')]"
+                            }
+                        /*    "loadBalancerBackendAddressPools": [
+                                {
+                                    "id": "[resourceId('Microsoft.Network/loadBalancers/backendAddressPools', variables('loadBalancer8Name'), 'BackendPool8')]"
+                                }
+                            ]*/
+                        }
+                    }
+                ]
+            },
+            "copy": {
+                "name": "nicLoop",
+                "count": "[parameters('numberOfSQLInstances')]"
+            }
+        },
+
+		/* Public Load balancer*/
+		    {
+			"type": "Microsoft.Network/loadBalancers",
+			"name": "[variables('loadBalancer1Name')]",
+			"apiVersion": "2020-06-01",
+			"location": "[parameters('location')]",
+			"comments": "This Load Balancer is used to load balance Web traffic among Web Tier VMs",
+		/*	"tags": {
+			"displayName": "External Load Balancer",
+			"quickstartName": "[variables('quickstartTags').name]",
+			"provider": "[variables('redHatTags').provider]"
+			},*/
+			"dependsOn": [
+				"[concat('Microsoft.Network/publicIPAddresses/', variables('publicIPAddressName'))]"
+			],
+			"sku": {
+                "name": "Standard"
+            },
+			"properties": {
+				"frontendIPConfigurations": [
+				{
+					"name": "loadBalancerFrontEnd",
+						"properties": {
+							"publicIPAddress": {
+							"id": "[resourceId('Microsoft.Network/publicIPAddresses',variables('publicIPAddressName'))]"
+							}
+					}
+				}
+        ],
+        "backendAddressPools": [
+          {
+            "name": "BackendPool1"
+          }
+        ],
+        "loadBalancingRules": [
+                    {
+                        "properties": {
+                            "frontendIPConfiguration": {
+                                "id": "[resourceId('Microsoft.Network/loadBalancers/frontendIpConfigurations', variables('loadBalancer1Name'), 'LoadBalancerFrontend')]"
+                            },
+                            "backendAddressPool": {
+                                "id": "[resourceId('Microsoft.Network/loadBalancers/backendAddressPools', variables('loadBalancer1Name'), 'BackendPool1')]"
+                            },
+                            "probe": {
+                                "id": "[resourceId('Microsoft.Network/loadBalancers/probes', variables('loadBalancer1Name'), 'lbprobe')]"
+                            },
+                            "protocol": "Tcp",
+                            "frontendPort": 443,
+                            "backendPort": 443,
+                            "idleTimeoutInMinutes": 15
+                        },
+                        "Name": "HTTPS"
+						
+					}	
+        ],
+        "probes": [
+          {
+            "name": "lbprobe",
+            "properties": {
+              "protocol": "Tcp",
+              "port": 443,
+              "intervalInSeconds": 5,
+              "numberOfProbes": 2
+            }
+          }
+        ]
+      }
+    },
+	/*Internal Load balancer*/
+        {
+            "type": "Microsoft.Network/loadBalancers",
+            "apiVersion": "2020-06-01",
+            "name": "[variables('loadBalancer2Name')]",
+            "location": "[parameters('location')]",
+            "dependsOn": [
+                "[variables('virtualNetworkName')]"
+            ],
+            "sku": {
+                "name": "Standard"
+            },
+            "properties": {
+                "frontendIPConfigurations": [
+                    {
+                        "properties": {
+                            "subnet": {
+                                "id": "[variables('subnet2Ref')]"
+                            },
+                            "privateIPAddress": "172.16.16.20",
+                            "privateIPAllocationMethod": "Static"
+                        },
+                        "name": "LoadBalancerFrontend"
+                    }
+                ],
+                "backendAddressPools": [
+                    {
+                        "name": "BackendPool2"
+                    }
+                ],
+                "loadBalancingRules": [
+                    {
+                        "properties": {
+                            "frontendIPConfiguration": {
+                                "id": "[resourceId('Microsoft.Network/loadBalancers/frontendIpConfigurations', variables('loadBalancer2Name'), 'LoadBalancerFrontend')]"
+                            },
+                            "backendAddressPool": {
+                                "id": "[resourceId('Microsoft.Network/loadBalancers/backendAddressPools', variables('loadBalancer2Name'), 'BackendPool2')]"
+                            },
+                            "probe": {
+                                "id": "[resourceId('Microsoft.Network/loadBalancers/probes', variables('loadBalancer2Name'), 'lbprobe')]"
+                            },
+                            "protocol": "Tcp",
+                            "frontendPort": 443,
+                            "backendPort": 443,
+                            "idleTimeoutInMinutes": 15
+                        },
+                        "Name": "HTTPS"
+						
+					},	
+					{
+						"properties": {
+                            "frontendIPConfiguration": {
+                                "id": "[resourceId('Microsoft.Network/loadBalancers/frontendIpConfigurations', variables('loadBalancer2Name'), 'LoadBalancerFrontend')]"
+                            },
+                            "backendAddressPool": {
+                                "id": "[resourceId('Microsoft.Network/loadBalancers/backendAddressPools', variables('loadBalancer2Name'), 'BackendPool2')]"
+                            },
+                            "probe": {
+                                "id": "[resourceId('Microsoft.Network/loadBalancers/probes', variables('loadBalancer2Name'), 'lbprobe')]"
+                            },
+                            "protocol": "Tcp",
+                            "frontendPort": 3306,
+                            "backendPort": 3306,
+                            "idleTimeoutInMinutes": 15
+                        },
+                        "Name": "dbport"
+                    },
+										{
+						"properties": {
+                            "frontendIPConfiguration": {
+                                "id": "[resourceId('Microsoft.Network/loadBalancers/frontendIpConfigurations', variables('loadBalancer2Name'), 'LoadBalancerFrontend')]"
+                            },
+                            "backendAddressPool": {
+                                "id": "[resourceId('Microsoft.Network/loadBalancers/backendAddressPools', variables('loadBalancer2Name'), 'BackendPool2')]"
+                            },
+                            "probe": {
+                                "id": "[resourceId('Microsoft.Network/loadBalancers/probes', variables('loadBalancer2Name'), 'lbprobe')]"
+                            },
+                            "protocol": "Tcp",
+                            "frontendPort": 939,
+                            "backendPort": 939,
+                            "idleTimeoutInMinutes": 15
+                        },
+                        "Name": "infoagent"
+                    },
+										{
+						"properties": {
+                            "frontendIPConfiguration": {
+                                "id": "[resourceId('Microsoft.Network/loadBalancers/frontendIpConfigurations', variables('loadBalancer2Name'), 'LoadBalancerFrontend')]"
+                            },
+                            "backendAddressPool": {
+                                "id": "[resourceId('Microsoft.Network/loadBalancers/backendAddressPools', variables('loadBalancer2Name'), 'BackendPool2')]"
+                            },
+                            "probe": {
+                                "id": "[resourceId('Microsoft.Network/loadBalancers/probes', variables('loadBalancer2Name'), 'lbprobe')]"
+                            },
+                            "protocol": "Tcp",
+                            "frontendPort": 3636,
+                            "backendPort": 3636,
+                            "idleTimeoutInMinutes": 15
+                        },
+                        "Name": "hapage"
+                    },
+										{
+						"properties": {
+                            "frontendIPConfiguration": {
+                                "id": "[resourceId('Microsoft.Network/loadBalancers/frontendIpConfigurations', variables('loadBalancer2Name'), 'LoadBalancerFrontend')]"
+                            },
+                            "backendAddressPool": {
+                                "id": "[resourceId('Microsoft.Network/loadBalancers/backendAddressPools', variables('loadBalancer2Name'), 'BackendPool2')]"
+                            },
+                            "probe": {
+                                "id": "[resourceId('Microsoft.Network/loadBalancers/probes', variables('loadBalancer2Name'), 'lbprobe')]"
+                            },
+                            "protocol": "Tcp",
+                            "frontendPort": 51234,
+                            "backendPort": 51234,
+                            "idleTimeoutInMinutes": 15
+                        },
+                        "Name": "Remote-Meeting"
+                    }
+                ],
+                "probes": [
+                    {
+                        "properties": {
+                            "protocol": "Tcp",
+                            "port": 443,
+                            "intervalInSeconds": 15,
+                            "numberOfProbes": 2
+                        },
+                        "name": "lbprobe"
+                    }
+                ]
+            }
+        },
+		/* HySecure Web Nodes VM*/
+        {
+            "type": "Microsoft.Compute/virtualMachines",
+            "apiVersion": "2020-06-01",
+            "name": "[concat(parameters('HysecureWebFrontendVMPrefix'), copyindex())]",
+            "location": "[parameters('location')]",
+            "dependsOn": [
+                "[variables('storageAccountName')]",
+                "nicLoop",
+                "[variables('availabilitySet1Name')]"
+            ],
+            "properties": {
+                "availabilitySet": {
+                    "id": "[resourceId('Microsoft.Compute/availabilitySets',variables('availabilitySet1Name'))]"
+                },
+                "hardwareProfile": {
+                    "vmSize": "[parameters('HSWvmSize')]"
+                },
+                "osProfile": {
+                    "computerName": "[concat(parameters('HysecureWebFrontendVMPrefix'), copyIndex())]",
+                    "adminUsername": "[parameters('adminUsername')]",
+                    "adminPassword": "[parameters('adminPassword')]"
+                },
+                "storageProfile": {
+                    "imageReference": {
+                        "publisher": "accops",
+                        "offer": "hysecure",
+                        "sku": "accops-hysecure-5353",
+                        "version": "1.0.0"
+                    },
+                    "osDisk": {
+                        "createOption": "FromImage"
+                    }
+                },
+                "networkProfile": {
+                    "networkInterfaces": [
+                        {
+                            "id": "[resourceId('Microsoft.Network/networkInterfaces', concat(variables('networkInterface1Name'), copyindex()))]"
+                        }
+                    ]
+                },
+                "diagnosticsProfile": {
+                    "bootDiagnostics": {
+                        "enabled": true,
+                        "storageUri": "[reference(variables('storageAccountName')).primaryEndpoints.blob]"
+                    }
+                }
+            },
+			"plan": {
+                "name": "accops-hysecure-5353",
+                "publisher": "accops",
+                "product": "hysecure"
+            },
+            "copy": {
+                "name": "virtualMachineLoop",
+                "count": "[parameters('numberOfHysecureWebFrontendInstances')]"
+            }
+        },
+		
+		
+				/* HySecure Mgmt Nodes VM*/
+		{
+            "type": "Microsoft.Compute/virtualMachines",
+            "apiVersion": "2020-06-01",
+            "name": "[concat(parameters('HysecureManagementVMNamePrefix'), copyindex())]",
+            "location": "[parameters('location')]",
+            "dependsOn": [
+                "[variables('storageAccountName')]",
+                "nicLoop",
+                "[variables('availabilitySet2Name')]"
+            ],
+            "properties": {
+                "availabilitySet": {
+                    "id": "[resourceId('Microsoft.Compute/availabilitySets',variables('availabilitySet2Name'))]"
+                },
+                "hardwareProfile": {
+                    "vmSize": "[parameters('HSMvmSize')]"
+                },
+                "osProfile": {
+                    "computerName": "[concat(parameters('HysecureManagementVMNamePrefix'), copyIndex())]",
+                    "adminUsername": "[parameters('adminUsername')]",
+                    "adminPassword": "[parameters('adminPassword')]"
+                },
+                "storageProfile": {
+                    "imageReference": {
+                        "publisher": "accops",
+                        "offer": "hysecure",
+                        "sku": "accops-hysecure-5353",
+                        "version": "1.0.0"
+                    },
+                    "osDisk": {
+                        "createOption": "FromImage"
+                    }
+                },
+                "networkProfile": {
+                    "networkInterfaces": [
+                        {
+                            "id": "[resourceId('Microsoft.Network/networkInterfaces', concat(variables('networkInterface2Name'), copyindex()))]"
+                        }
+                    ]
+                },
+                "diagnosticsProfile": {
+                    "bootDiagnostics": {
+                        "enabled": true,
+                        "storageUri": "[reference(variables('storageAccountName')).primaryEndpoints.blob]"
+                    }
+                }
+            },
+			"plan": {
+                "name": "accops-hysecure-5353",
+                "publisher": "accops",
+                "product": "hysecure"
+            },
+            "copy": {
+                "name": "virtualMachineLoop",
+                "count": "[parameters('numberOfHysecureManagementInstances')]"
+            }
+        },
+		/* Hyworks Management Node */
+		{
+            "type": "Microsoft.Compute/virtualMachines",
+            "apiVersion": "2020-06-01",
+            "name": "[concat(parameters('HyworksManagementVMPrefix'), copyindex())]",
+            "location": "[parameters('location')]",
+            "dependsOn": [
+                "[variables('storageAccountName')]",
+                "nicLoop",
+                "[variables('availabilitySet3Name')]"
+            ],
+            "properties": {
+                "availabilitySet": {
+                    "id": "[resourceId('Microsoft.Compute/availabilitySets',variables('availabilitySet3Name'))]"
+                },
+                "hardwareProfile": {
+                    "vmSize": "[parameters('HWMvmSize')]"
+                },
+                "osProfile": {
+                    "computerName": "[concat(parameters('HyworksManagementVMPrefix'), copyIndex())]",
+                    "adminUsername": "[parameters('adminUsername')]",
+                    "adminPassword": "[parameters('adminPassword')]",
+					"windowsConfiguration": {
+                        "enableAutomaticUpdates": true,
+                        "provisionVmAgent": true,
+                        "patchSettings": {
+                            "patchMode": "[parameters('patchMode')]"
+                        }
+                    }
+                },
+                "storageProfile": {
+                    "imageReference": {
+                        "publisher": "MicrosoftWindowsServer",
+                        "offer": "WindowsServer",
+                        "sku": "2019-Datacenter",
+                        "version": "latest"
+                    },
+                    "osDisk": {
+                        "createOption": "FromImage",
+						"managedDisk": {
+                            "storageAccountType": "[parameters('osDiskType')]"
+                        }
+                    }
+                },
+                "networkProfile": {
+                    "networkInterfaces": [
+                        {
+                            "id": "[resourceId('Microsoft.Network/networkInterfaces', concat(variables('networkInterface3Name'), copyindex()))]"
+                        }
+                    ]
+                },
+				"licenseType": "Windows_Server",
+                "diagnosticsProfile": {
+                    "bootDiagnostics": {
+                        "enabled": true,
+                        "storageUri": "[reference(variables('storageAccountName')).primaryEndpoints.blob]"
+                    }
+                }
+            },
+            "copy": {
+                "name": "virtualMachineLoop",
+                "count": "[parameters('numberOfHyworksManagementInstances')]"
+            }
+        },
+				/* Hyworks Session Node */
+		{
+            "type": "Microsoft.Compute/virtualMachines",
+            "apiVersion": "2020-06-01",
+            "name": "[concat(parameters('HyworksSessionVMPrefix'), copyindex())]",
+            "location": "[parameters('location')]",
+            "dependsOn": [
+                "[variables('storageAccountName')]",
+                "nicLoop",
+                "[variables('availabilitySet4Name')]"
+            ],
+            "properties": {
+                "availabilitySet": {
+                    "id": "[resourceId('Microsoft.Compute/availabilitySets',variables('availabilitySet4Name'))]"
+                },
+                "hardwareProfile": {
+                    "vmSize": "[parameters('HWSvmSize')]"
+                },
+                "osProfile": {
+                    "computerName": "[concat(parameters('HyworksSessionVMPrefix'), copyIndex())]",
+                    "adminUsername": "[parameters('adminUsername')]",
+                    "adminPassword": "[parameters('adminPassword')]",
+					"windowsConfiguration": {
+                        "enableAutomaticUpdates": true,
+                        "provisionVmAgent": true,
+                        "patchSettings": {
+                            "patchMode": "[parameters('patchMode')]"
+                        }
+                    }
+                },
+                "storageProfile": {
+                    "imageReference": {
+                        "publisher": "MicrosoftWindowsServer",
+                        "offer": "WindowsServer",
+                        "sku": "2019-Datacenter",
+                        "version": "latest"
+                    },
+                    "osDisk": {
+                        "createOption": "FromImage",
+						"managedDisk": {
+                            "storageAccountType": "[parameters('osDiskType')]"
+                        }
+                    }
+                },
+                "networkProfile": {
+                    "networkInterfaces": [
+                        {
+                            "id": "[resourceId('Microsoft.Network/networkInterfaces', concat(variables('networkInterface4Name'), copyindex()))]"
+                        }
+                    ]
+                },
+				"licenseType": "Windows_Server",
+                "diagnosticsProfile": {
+                    "bootDiagnostics": {
+                        "enabled": true,
+                        "storageUri": "[reference(variables('storageAccountName')).primaryEndpoints.blob]"
+                    }
+                }
+            },
+            "copy": {
+                "name": "virtualMachineLoop",
+                "count": "[parameters('numberOfHyworksSessionInstances')]"
+            }
+        },
+		
+		/*AD*/
+		
+		{
+            "type": "Microsoft.Compute/virtualMachines",
+            "apiVersion": "2020-06-01",
+            "name": "[concat(parameters('DomainControllerVMPrefix'), copyindex())]",
+            "location": "[parameters('location')]",
+            "dependsOn": [
+                "[variables('storageAccountName')]",
+                "nicLoop",
+                "[variables('availabilitySet7Name')]"
+            ],
+            "properties": {
+                "availabilitySet": {
+                    "id": "[resourceId('Microsoft.Compute/availabilitySets',variables('availabilitySet7Name'))]"
+                },
+                "hardwareProfile": {
+                    "vmSize": "[parameters('ADDCvmSize')]"
+                },
+                "osProfile": {
+                    "computerName": "[concat(parameters('DomainControllerVMPrefix'), copyIndex())]",
+                    "adminUsername": "[parameters('adminUsername')]",
+                    "adminPassword": "[parameters('adminPassword')]",
+					"windowsConfiguration": {
+                        "enableAutomaticUpdates": true,
+                        "provisionVmAgent": true,
+                        "patchSettings": {
+                            "patchMode": "[parameters('patchMode')]"
+                        }
+                    }
+                },
+                "storageProfile": {
+                    "imageReference": {
+                        "publisher": "MicrosoftWindowsServer",
+                        "offer": "WindowsServer",
+                        "sku": "2019-Datacenter",
+                        "version": "latest"
+                    },
+                    "osDisk": {
+                        "createOption": "FromImage",
+						"managedDisk": {
+                            "storageAccountType": "[parameters('osDiskType')]"
+                        }
+                    }
+                },
+                "networkProfile": {
+                    "networkInterfaces": [
+                        {
+                            "id": "[resourceId('Microsoft.Network/networkInterfaces', concat(variables('networkInterface7Name'), copyindex()))]"
+                        }
+                    ]
+                },
+				"licenseType": "Windows_Server",
+                "diagnosticsProfile": {
+                    "bootDiagnostics": {
+                        "enabled": true,
+                        "storageUri": "[reference(variables('storageAccountName')).primaryEndpoints.blob]"
+                    }
+                }
+            },
+            "copy": {
+                "name": "virtualMachineLoop",
+                "count": "[parameters('numberOfADDCInstances')]"
+            }
+        },
+		
+		
+				/*SQL*/
+		
+		{
+            "type": "Microsoft.Compute/virtualMachines",
+            "apiVersion": "2020-06-01",
+            "name": "[concat(parameters('SQLVMPrefix'), copyindex())]",
+            "location": "[parameters('location')]",
+            "dependsOn": [
+                "[variables('storageAccountName')]",
+                "nicLoop",
+                "[variables('availabilitySet8Name')]"
+            ],
+            "properties": {
+                "availabilitySet": {
+                    "id": "[resourceId('Microsoft.Compute/availabilitySets',variables('availabilitySet8Name'))]"
+                },
+                "hardwareProfile": {
+                    "vmSize": "[parameters('SQLvmSize')]"
+                },
+                "osProfile": {
+                    "computerName": "[concat(parameters('SQLVMPrefix'), copyIndex())]",
+                    "adminUsername": "[parameters('adminUsername')]",
+                    "adminPassword": "[parameters('adminPassword')]",
+					"windowsConfiguration": {
+                        "enableAutomaticUpdates": true,
+                        "provisionVmAgent": true,
+                        "patchSettings": {
+                            "patchMode": "[parameters('patchMode')]"
+                        }
+                    }
+                },
+                "storageProfile": {
+                    "imageReference": {
+                        "publisher": "MicrosoftWindowsServer",
+                        "offer": "WindowsServer",
+                        "sku": "2019-Datacenter",
+                        "version": "latest"
+                    },
+                    "osDisk": {
+                        "createOption": "FromImage",
+						"managedDisk": {
+                            "storageAccountType": "[parameters('osDiskType')]"
+                        }
+                    }
+                },
+                "networkProfile": {
+                    "networkInterfaces": [
+                        {
+                            "id": "[resourceId('Microsoft.Network/networkInterfaces', concat(variables('networkInterface8Name'), copyindex()))]"
+                        }
+                    ]
+                },
+				"licenseType": "Windows_Server",
+                "diagnosticsProfile": {
+                    "bootDiagnostics": {
+                        "enabled": true,
+                        "storageUri": "[reference(variables('storageAccountName')).primaryEndpoints.blob]"
+                    }
+                }
+            },
+            "copy": {
+                "name": "virtualMachineLoop",
+                "count": "[parameters('numberOfSQLInstances')]"
+            }
+        },
+		
+		
+				/*SQL Witness*/
+		
+		{
+            "type": "Microsoft.Compute/virtualMachines",
+            "apiVersion": "2020-06-01",
+            "name": "[concat(parameters('SQLWitnessVMPrefix'), copyindex())]",
+            "location": "[parameters('location')]",
+            "dependsOn": [
+                "[variables('storageAccountName')]"
+            ],
+            "properties": {
+                "hardwareProfile": {
+                    "vmSize": "[parameters('SQLWitnessvmSize')]"
+                },
+                "osProfile": {
+                    "computerName": "[concat(parameters('SQLWitnessVMPrefix'), copyIndex())]",
+                    "adminUsername": "[parameters('adminUsername')]",
+                    "adminPassword": "[parameters('adminPassword')]",
+					"windowsConfiguration": {
+                        "enableAutomaticUpdates": true,
+                        "provisionVmAgent": true,
+                        "patchSettings": {
+                            "patchMode": "[parameters('patchMode')]"
+                        }
+                    }
+                },
+                "storageProfile": {
+                    "imageReference": {
+                        "publisher": "MicrosoftWindowsServer",
+                        "offer": "WindowsServer",
+                        "sku": "2019-Datacenter",
+                        "version": "latest"
+                    },
+                    "osDisk": {
+                        "createOption": "FromImage",
+						"managedDisk": {
+                            "storageAccountType": "[parameters('osDiskType')]"
+                        }
+                    }
+                },
+                "networkProfile": {
+                    "networkInterfaces": [
+                        {
+                            "id": "[resourceId('Microsoft.Network/networkInterfaces', concat(variables('networkInterface8Name'), copyindex()))]"
+                        }
+                    ]
+                },
+				"licenseType": "Windows_Server",
+                "diagnosticsProfile": {
+                    "bootDiagnostics": {
+                        "enabled": true,
+                        "storageUri": "[reference(variables('storageAccountName')).primaryEndpoints.blob]"
+                    }
+                }
+            }
+        },
+		
+		
+		/*GOLD*/
+		{
+            "type": "Microsoft.Compute/virtualMachines",
+            "apiVersion": "2020-06-01",
+            "name": "[concat(parameters('WindowsDedicatedGoldVMPrefix'), copyindex())]",
+            "location": "[parameters('location')]",
+            "dependsOn": [
+                "[variables('storageAccountName')]",
+                "nicLoop",
+                "[variables('availabilitySet5Name')]"
+            ],
+            "properties": {
+                "availabilitySet": {
+                    "id": "[resourceId('Microsoft.Compute/availabilitySets',variables('availabilitySet5Name'))]"
+                },
+                "hardwareProfile": {
+                    "vmSize": "[parameters('GoldWinvmSize')]"
+                },
+                "osProfile": {
+                    "computerName": "[concat(parameters('WindowsDedicatedGoldVMPrefix'), copyIndex())]",
+                    "adminUsername": "[parameters('adminUsername')]",
+                    "adminPassword": "[parameters('adminPassword')]",
+					"windowsConfiguration": {
+                        "enableAutomaticUpdates": true,
+                        "provisionVmAgent": true,
+                        "patchSettings": {
+                            "patchMode": "[parameters('patchMode')]"
+                        }
+                    }
+                },
+                "storageProfile": {
+                    "imageReference": {
+                        "publisher": "microsoftwindowsdesktop",
+                        "offer": "office-365",
+                        "sku": "20h1-evd-o365pp",
+                        "version": "latest"
+                    },
+                    "osDisk": {
+                        "createOption": "FromImage",
+						"managedDisk": {
+                            "storageAccountType": "[parameters('osDiskType')]"
+                        }
+                    }
+                },
+                "networkProfile": {
+                    "networkInterfaces": [
+                        {
+                            "id": "[resourceId('Microsoft.Network/networkInterfaces', concat(variables('networkInterface5Name'), copyindex()))]"
+                        }
+                    ]
+                },
+				"licenseType": "Windows_Client",
+                "diagnosticsProfile": {
+                    "bootDiagnostics": {
+                        "enabled": true,
+                        "storageUri": "[reference(variables('storageAccountName')).primaryEndpoints.blob]"
+                    }
+                }
+            },
+            "copy": {
+                "name": "virtualMachineLoop",
+                "count": "[parameters('numberOfWindowsDedicatedGoldInstances')]"
+            }
+        },
+        /* Jump Box Virtual Machine*/
+		{
+            "type": "Microsoft.Compute/virtualMachines",
+            "apiVersion": "2020-06-01",
+            "name": "[concat(parameters('WindowsJumpBoxVMPrefix'), copyindex())]",
+            "location": "[parameters('location')]",
+            "dependsOn": [
+                "[variables('storageAccountName')]",
+                "nicLoop",
+                "[variables('availabilitySet6Name')]"
+            ],
+            "properties": {
+                "availabilitySet": {
+                    "id": "[resourceId('Microsoft.Compute/availabilitySets',variables('availabilitySet6Name'))]"
+                },
+                "hardwareProfile": {
+                    "vmSize": "[parameters('JumpBoxvmSize')]"
+                },
+                "osProfile": {
+                    "computerName": "[concat(parameters('WindowsJumpBoxVMPrefix'), copyIndex())]",
+                    "adminUsername": "[parameters('adminUsername')]",
+                    "adminPassword": "[parameters('adminPassword')]",
+					"windowsConfiguration": {
+                        "enableAutomaticUpdates": true,
+                        "provisionVmAgent": true,
+                        "patchSettings": {
+                            "patchMode": "[parameters('patchMode')]"
+                        }
+                    }
+                },
+                "storageProfile": {
+                    "imageReference": {
+                        "publisher": "microsoftwindowsdesktop",
+                        "offer": "office-365",
+                        "sku": "20h1-evd-o365pp",
+                        "version": "latest"
+                    },
+                    "osDisk": {
+                        "createOption": "FromImage",
+						"managedDisk": {
+                            "storageAccountType": "[parameters('osDiskType')]"
+                        }
+                    }
+                },
+                "networkProfile": {
+                    "networkInterfaces": [
+                        {
+                            "id": "[resourceId('Microsoft.Network/networkInterfaces', concat(variables('networkInterface6Name'), copyindex()))]"
+                        }
+                    ]
+                },
+				"licenseType": "Windows_Client",
+                "diagnosticsProfile": {
+                    "bootDiagnostics": {
+                        "enabled": true,
+                        "storageUri": "[reference(variables('storageAccountName')).primaryEndpoints.blob]"
+                    }
+                }
+            },
+            "copy": {
+                "name": "virtualMachineLoop",
+                "count": "[parameters('numberOfJumpBoxInstances')]"
+            }
+        }
+		
+		/*INSTALL PRIMARY DOMAIN CONTROLLER*/
+		
+		
+		
+    ]
+}
