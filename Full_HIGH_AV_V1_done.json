@@ -15,6 +15,27 @@
                 "description": "Admin password"
             }
         },
+        "domainName": {
+            "type": "string",
+            "metadata": {
+                "description": "The FQDN of the AD Domain created "
+             },
+            "defaultValue": "contoso.local"
+        },
+		"virtualNetworkName": {
+			"type": "string",
+			"defaultValue": "Appliance-VNet",
+			"metadata": {
+				"description": "VMs Virtual Network"
+			}
+		},
+		"virtualNetworkAddressPrefix": {
+			"type": "string",
+			"defaultValue": "172.16.16.0/24",
+				"metadata": {
+					"description": "Virtual Network Address Space"
+				}
+		},
 		/* HySecure Web Node which will be serving the End User Request */
 		
 		"HysecureWebFrontendVMPrefix": {
@@ -42,7 +63,7 @@
 				10
             ],
             "defaultValue": 2
-        },
+        },		
 		"HSWvmSize": {
             "type": "string",
             "defaultValue": "Standard_B2s",
@@ -53,7 +74,14 @@
             "metadata": {
              "description": "Size of the HySecure Web Frontend Node Servers"
             }
-        },	
+        },
+		"HySecureWeb-Subnet": {
+			"type": "string",
+			"metadata": {
+				"description": "The address range of the HySecure Web Servers from VNET Address Space"
+			},
+			"defaultValue": "172.16.16.0/28"
+		},		
 
 		/* HySecure Management Node which will be used for Management of cluster and All the Rules configurations */
 		
@@ -86,6 +114,13 @@
              "description": "Size of the HySecure Management Node Servers"
             }
         },
+		"HySecureMgmt-Subnet": {
+			"type": "string",
+			"metadata": {
+				"description": "The address range of the HySecure Web Servers from VNET Address Space"
+			},
+			"defaultValue": "172.16.16.16/28"
+		},
 		
 		/* Domain Controller Nodes */
 		
@@ -117,9 +152,15 @@
             "metadata": {
              "description": "Size of the Domain Controller Node"
             }
-        },		
-		
-		
+        },
+		"ADDC-Subnet": {
+			"type": "string",
+			"metadata": {
+				"description": "The address range of the HySecure Web Servers from VNET Address Space"
+			},
+			"defaultValue": "172.16.16.160/28"
+		},		
+				
 	    /* SQL */
 		
 		"SQLVMPrefix": {
@@ -150,12 +191,19 @@
             "metadata": {
              "description": "Size of the SQL Node"
             }
-        },		
+        },
+		"SQL-Subnet": {
+			"type": "string",
+			"metadata": {
+				"description": "The address range of the HySecure Web Servers from VNET Address Space"
+			},
+			"defaultValue": "172.16.16.192/28"
+		},		
 		
-			    /* SQL */
+			    /* SQLW */
 		
 		"SQLWitnessVMPrefix": {
-            "defaultValue": "SQLW-",
+            "defaultValue": "SQLW",
             "type": "String",
             "metadata": {
                 "description": "Prefix to use for SQL Witness VM names"
@@ -204,7 +252,7 @@
             ],
             "defaultValue": 2
         },
-		"HWMvmSize": {
+		"HyworksManagementVMSize": {
             "type": "string",
             "defaultValue": "Standard_B2s",
 			"allowedValues": [
@@ -215,6 +263,13 @@
              "description": "Size of the HyWorks Management Node Servers"
             }
         },
+		"HyWorksMgmt-Subnet": {
+			"type": "string",
+			"metadata": {
+				"description": "The address range of the HySecure Web Servers from VNET Address Space"
+			},
+			"defaultValue": "172.16.16.32/28"
+		},
 		
 		/* HyWorks Session Nodes */
 		
@@ -240,9 +295,9 @@
             ],
             "defaultValue": 2
         },
-		"HWSvmSize": {
+		"HyworksSessionHostVMSize": {
             "type": "string",
-            "defaultValue": "Standard_DS1",
+            "defaultValue": "Standard_B2s",
 			"allowedValues": [
                 "Standard_DS1",
                 "Standard_B2s"
@@ -251,6 +306,13 @@
              "description": "Size of the HyWorks Management Node Servers"
             }
         },
+		"HyWorksSession-Subnet": {
+			"type": "string",
+			"metadata": {
+				"description": "The address range of the HySecure Web Servers from VNET Address Space"
+			},
+			"defaultValue": "172.16.16.64/28"
+		},
 		/* Gold VM */
 		
 		"WindowsDedicatedGoldVMPrefix": {
@@ -271,17 +333,24 @@
             ],
             "defaultValue": 1
         },
-		"GoldWinvmSize": {
+		"GoldVMSize": {
             "type": "string",
             "defaultValue": "Standard_B2s",
 			"allowedValues": [
-                "Standard_D2s_v3",
+                "Standard_DS1",
                 "Standard_B2s"
             ],
             "metadata": {
              "description": "Size of the Windows Dedicated Gold VMs"
             }
         },
+		"VDI-Subnet": {
+			"type": "string",
+			"metadata": {
+				"description": "The address range of the HySecure Web Servers from VNET Address Space"
+			},
+			"defaultValue": "172.16.16.96/28"
+		},
 		
 		/* Jump Box*/
 		
@@ -303,17 +372,24 @@
             ],
             "defaultValue": 1
         },
-		"JumpBoxvmSize": {
+		"JumpVMSize": {
             "type": "string",
             "defaultValue": "Standard_B2s",
 			"allowedValues": [
-                "Standard_D2s_v3",
+                "Standard_DS1",
                 "Standard_B2s"
             ],
             "metadata": {
              "description": "Size of the Windows Dedicated Gold VMs"
             }
         },
+		"JumpBox-Subnet": {
+			"type": "string",
+			"metadata": {
+				"description": "The address range of the HySecure Web Servers from VNET Address Space"
+			},
+			"defaultValue": "172.16.16.128/28"
+		},
 		
 		"osDiskType": {
             "type": "string",
@@ -331,7 +407,8 @@
                  "defaultValue": "",
                  "metadata": {
                    "description": "The sasToken required to access _artifactsLocation.  When the template is deployed using the accompanying scripts, a sasToken will be automatically generated. Use the defaultValue if the staging location is not secured."
-                 }
+                 },
+				 "defaultValue": "https://raw.githubusercontent.com/pravindkr/cloud/main/Full_HIGH_AV_V1_done.json"
         },
         "location": {
             "type": "string",
@@ -1693,7 +1770,7 @@
 		{
             "type": "Microsoft.Compute/virtualMachines",
             "apiVersion": "2020-06-01",
-            "name": "[concat(parameters('SQLWitnessVMPrefix'), copyindex())]",
+            "name": "[concat(parameters('SQLWitnessVMPrefix'))]",
             "location": "[parameters('location')]",
             "dependsOn": [
                 "[variables('storageAccountName')]"
@@ -1703,7 +1780,7 @@
                     "vmSize": "[parameters('SQLWitnessvmSize')]"
                 },
                 "osProfile": {
-                    "computerName": "[concat(parameters('SQLWitnessVMPrefix'), copyIndex())]",
+                    "computerName": "[concat(parameters('SQLWitnessVMPrefix'))]",
                     "adminUsername": "[parameters('adminUsername')]",
                     "adminPassword": "[parameters('adminPassword')]",
 					"windowsConfiguration": {
@@ -1731,7 +1808,7 @@
                 "networkProfile": {
                     "networkInterfaces": [
                         {
-                            "id": "[resourceId('Microsoft.Network/networkInterfaces', concat(variables('networkInterface8Name'), copyindex()))]"
+                            "id": "[resourceId('Microsoft.Network/networkInterfaces', concat(variables('networkInterface8Name')))]"
                         }
                     ]
                 },
