@@ -39,6 +39,7 @@
                 "description": "Determines whether this is a high available deployment or not. A HA deployment contains multiple instances of single point of failures."
                }
         },
+		
 		"HysecureWebNodeNamePrefix": {
             "defaultValue": "HySecure-Web-Node-",
             "type": "String",
@@ -117,6 +118,20 @@
             "description": "The FQDN of the AD Domain created "
             }
         },
+		"sqlServerServiceAccountUserName": {
+		  "type": "string",
+		  "metadata": {
+			"description": "The SQL Server Service Account name"
+		  },
+		  "defaultValue": "sqlservice"
+		},
+		"sqlServerServiceAccountPassword": {
+		  "type": "securestring",
+		  "metadata": {
+			"description": "The SQL Server Service Account password"
+		  },
+		  "defaultValue": "Demo#1234321CA"
+		},
 		"osType": {
             "type": "string",
             "allowedValues": [
@@ -371,7 +386,7 @@
 			"metadata": {
 				"description": "The location of resources such as templates and DSC modules that the script is dependent"
 				},
-			"defaultValue": "https://raw.githubusercontent.com/pravindkr/Azure/main/B2B/azuredeploy.json"
+			"defaultValue": "https://raw.githubusercontent.com/pravindkr/cloud/main/azuredeploy.json"
 		},
 		"_artifactsLocationSasToken": {
 			"type": "securestring",
@@ -472,14 +487,13 @@
 			"description": "List of virtual machines to be domain joined, if using multiple VMs, make their names comma separate. E.g. VM01, VM02, VM03."
 		  }
 		}
-		/*
 		"ouPath": {
 		  "type": "string",
-		  "defaultValue": "DC=accops; DC=local",
+		  "defaultValue": "CN=Computers,DC=accops; DC=local",
 		  "metadata": {
 			"description": "Specifies an organizational unit (OU) for the domain account. Enter the full distinguished name of the OU in quotation marks. Example: \"OU=testOU; DC=domain; DC=Domain; DC=com\""
 		  }
-		} */
+		}
 
     },
     "variables": {
@@ -491,10 +505,10 @@
 		"availabilitySet6Name": "AvSetSQLTier",
 		"availabilitySet7Name": "AvSetARSMgmtTier",
 		"availabilitySet8Name": "AvSetARSDataTier",
-        	"storageAccountType": "Standard_LRS",
-        	"storageAccountName": "[uniqueString(resourceGroup().id)]",
-        	"virtualNetworkName": "AccopsDaasVNet",
-        	"subnet1Name": "HySecureWebSubnet",
+        "storageAccountType": "Standard_LRS",
+        "storageAccountName": "[uniqueString(resourceGroup().id)]",
+        "virtualNetworkName": "AccopsDaasVNet",
+        "subnet1Name": "HySecureWebSubnet",
 		"subnet2Name": "HySecureMgmtSubnet",
 		"subnet3Name": "HyWorksBrokerSubnet",
 		"subnet4Name": "HyWorksControllerSubnet",
@@ -574,145 +588,145 @@
                 }
 			
 		],
-        "sql1AddressNameWithSuffix": "[substring(concat(variables('sql1AddressName'), uniqueString(parameters('sqlStorageAccountName'),parameters('dcStorageAccountName'))),0,15)]",
-        "sql0AddressNameWithSuffix": "[substring(concat(variables('sql0AddressName'), uniqueString(parameters('sqlStorageAccountName'),parameters('dcStorageAccountName'))),0,15)]",
-        "loadBalancer2Name": "Intlb",
-	"publicIPAddressName": "PubliclbIP",
-	"loadBalancer1Name": "Extlb",
-	"loadBalancer3Name": "HWBrokerlb",
-	"lbSettings": {
-            "rdpLBFE": "rdpLBFE",
-            "sqlLBFE": "sqlLBFE",
-            "adLBBE": "adLBBE",
-            "sqlLBBE": "sqlLBBE",
-            "rdpLBName": "rdpLoadBalancer",
-            "sqlLBName": "sqlLoadBalancer"
-        	},
-	"SQLAOProbe": "SQLAlwaysOnEndPointProbe",
-	"sql1AddressName": "sql1IP",
-        "sql0AddressName": "sql0IP",
-	"vmSettings": {
-		"availabilitySets": {
-			"sqlAvailabilitySetName": "sqlAvailabilitySet"
-		  },
-		"noOfSqlVMs": 2,
-		"vmContainerName": "vhds",
-		"sqlVMName": "sqlserver-",
-		"sqlwVMName": "cluster-fsw",
-		"windowsImagePublisher": "MicrosoftWindowsServer",
-		"windowsImageOffer": "WindowsServer",
-		"windowsImageSKU": "2019-datacenter-smalldisk-g2",
-		"sqlImagePublisher": "MicrosoftSQLServer",
-		"sqlImageOffer": "[parameters('sqlServerVersion')]",
-		"rdpPort": 3389,
-		"windowsDiskSize": 128,
-		"sqlDiskSize": 100
-        	},
-	"sqlAOEPName": "[concat(parameters('deploymentPrefix'),'-hadr')]",
-	"sharePath": "[concat(parameters('deploymentPrefix'),'-fsw')]",
-	"clusterName": "[concat(parameters('deploymentPrefix'),'-fc')]",
-	"sqlwNicName": "[concat(variables('vmSettings').sqlwVMName,'-nic')]",		
-	"loadBalancer4Name": "SQLIntlb",
-    "networkInterface1Name": "HSWebNic",
-	"networkInterface2Name": "HSMgmtNic",
-	"networkInterface3Name": "HWBrokerNic",
-	"networkInterface4Name": "HWControlNic",
-	"networkInterface5Name": "ADDCNic",
-	"networkInterface6Name": "SQLNic",
-	"networkInterface7Name": [
-			"MSVDINic",
-			"DVDINic",
-			"SHDNic"
-		],	
-	"networkInterface8Name": "ARSNic",
-	"networkInterface9Name": [
-			"ADPDCNic",
-			"ADBDCNic"
-		],
-	"vmName": [
-            "HQPDC",
-            "HQBDC"
-        	],
-	"ipAddress": [
-			"172.16.1.4",
-			"172.16.1.5"
-		],
-	"vnetTemplateUri": "[uri(parameters('_artifactsLocation'), concat('nestedtemplates/vnet.json', parameters('_artifactsLocationSasToken')))]",
-	"nicTemplateUri": "[uri(parameters('_artifactsLocation'), concat('nestedtemplates/nic.json', parameters('_artifactsLocationSasToken')))]",
-	"subnet1Ref": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('virtualNetworkName'), variables('subnet1Name'))]",
-    "subnet2Ref": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('virtualNetworkName'), variables('subnet2Name'))]",
-	"subnet3Ref": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('virtualNetworkName'), variables('subnet3Name'))]",
-	"subnet4Ref": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('virtualNetworkName'), variables('subnet4Name'))]",
-	"subnet5Ref": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('virtualNetworkName'), variables('subnet5Name'))]",
-	"subnet6Ref": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('virtualNetworkName'), variables('subnet6Name'))]",
-	"subnet7Ref": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('virtualNetworkName'), variables('subnet7Name'))]",
-	"subnet8Ref": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('virtualNetworkName'), variables('subnet8Name'))]",
-	"subnet9Ref": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('virtualNetworkName'), variables('subnet9Name'))]",
-	"subnet10Ref": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('virtualNetworkName'), variables('subnet10Name'))]",
-	"subnet11Ref": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('virtualNetworkName'), variables('subnet11Name'))]",
-	"derivedIds": {
-            "sqlBEAddressPoolID": "[resourceId('Microsoft.Network/loadBalancers/backendAddressPools',variables('lbSettings').sqlLBName,variables('lbSettings').sqlLBBE)]",
-            "sqllbFEConfigID": "[resourceId('Microsoft.Network/loadBalancers/frontendIPConfigurations',variables('lbSettings').sqlLBName,variables('lbSettings').sqlLBFE)]",
-            "sqllbProbeID": "[resourceId('Microsoft.Network/loadBalancers/probes',variables('lbSettings').sqlLBName,variables('SQLAOProbe'))]"
-        	},
-	"networkSecurityGroup1Name": "HySecure-Web-NSG",
-	"networkSecurityGroup2Name": "HySecure-Mgmt-NSG",
-	"networkSecurityGroup3Name": "HyWorks-Broker-NSG",
-	"networkSecurityGroup4Name": "HyWorks-Controller-NSG",
-	"networkSecurityGroup5Name": "ADDS-NSG",
-	"networkSecurityGroup6Name": "SQL-NSG",
-	"networkSecurityGroup7Name": "VDI-NSG",
-	"networkSecurityGroup8Name": "ARS-NSG",
-	"SQL2012SP2-WS2012R2": "Enterprise",
-        "SQL2012SP3-WS2012R2": "Enterprise",
-        "SQL2014-WS2012R2": "Enterprise",
-        "SQL2014SP2-WS2012R2": "Enterprise",
-        "SQL2016-WS2012R2": "Enterprise",
-        "SQL2017-WS2016": "Enterprise",
-        "sql2019-ws2019": "Enterprise",
-        "sql2019-ws2022": "Enterprise",
-        "Monday": true,
-        "Tuesday": true,
-        "Wednesday": true,
-        "Thursday": true,
-        "Friday": true,
-        "Saturday": true,
-        "Sunday": true,
-        "Never": false,
-        "Everyday": true,
-        "numberOfHySecureMgmtInstances": 1,
-	"numberOfHyWorksControllerInstances": 1,
-	"numberOfADDSInstances": 2,
-	"numberOfSQLInstances": 2,
-	"numberOfARSMasterInstances": 1,
-	"numberOfARSDataInstances": 1,
-	"numberOfGoldInstances": 1,
-	"numberOfInstances" : 2,
-	"domainJoinOptions": 3,
-    "vmListArray": "[split(parameters('vmList'),',')]",
-	"configuration": {
-            "vnetwithDNSTemplateURL": "[uri(parameters('_artifactsLocation'), concat('nested/vnet-with-dns-server.json', parameters('_artifactsLocationSasToken')))]",
-            "nicTemplateURL": "[uri(parameters('_artifactsLocation'), concat('nested/nic.json', parameters('_artifactsLocationSasToken')))]",
-            "rdpIPAdressSetupURL": "[uri(parameters('_artifactsLocation'), concat('nested/publicip-rdp.json', parameters('_artifactsLocationSasToken')))]",
-            "setupLBsUrl": "[uri(parameters('_artifactsLocation'), concat('nested/setupLBs.json', parameters('_artifactsLocationSasToken')))]",
-            "creatingNicsUrl": "[uri(parameters('_artifactsLocation'), concat('nested/creatingNICS.json', parameters('_artifactsLocationSasToken')))]",
-            "storageAccountVirtualNetworkPublicIP": "[uri(parameters('_artifactsLocation'), concat('nested/storageAccountVirtualNetworkPublicIP.json', parameters('_artifactsLocationSasToken')))]",
-            "provisioningVMs": "[uri(parameters('_artifactsLocation'), concat('nested/provisioningVM', parameters('numberOfSqlVMDisks'),'.json', parameters('_artifactsLocationSasToken')))]",
-            "configuringBackupADVM": "[uri(parameters('_artifactsLocation'), concat('nested/configuringBackupADVM.json', parameters('_artifactsLocationSasToken')))]",
-            "preparingAlwaysOnSqlServer": "[uri(parameters('_artifactsLocation'), concat('nested/preparingSqlServer.json', parameters('_artifactsLocationSasToken')))]",
-            "configuringAlwaysOn": "[uri(parameters('_artifactsLocation'), concat('nested/configuringAlwaysOn.json', parameters('_artifactsLocationSasToken')))]",
-            "adPDCModulesURL": "[uri(parameters('_artifactsLocation'), concat('scripts/CreateADPDC.ps1.zip', parameters('_artifactsLocationSasToken')))]",
-            "adPDCConfigurationFunction": "CreateADPDC.ps1\\CreateADPDC",
-            "adBDCModulesURL": "[uri(parameters('_artifactsLocation'), concat('scripts/CreateADBDC.ps1.zip', parameters('_artifactsLocationSasToken')))]",
-            "adBDCConfigurationFunction": "CreateADBDC.ps1\\CreateADBDC",
-            "fswModulesURL": "[uri(parameters('_artifactsLocation'), concat('scripts/CreateFileShareWitness.ps1.zip', parameters('_artifactsLocationSasToken')))]",
-            "fswConfigurationFunction": "CreateFileShareWitness.ps1\\CreateFileShareWitness",
-            "sqlAOPrepareModulesURL": "[uri(parameters('_artifactsLocation'), concat('scripts/PrepareAlwaysOnSqlServer.ps1.zip', parameters('_artifactsLocationSasToken')))]",
-            "sqlAOPrepareConfigurationFunction": "PrepareAlwaysOnSqlServer.ps1\\PrepareAlwaysOnSqlServer",
-            "createClusterModulesURL": "[uri(parameters('_artifactsLocation'), concat('scripts/CreateFailoverCluster.ps1.zip', parameters('_artifactsLocationSasToken')))]",
-            "createClusterConfigurationFunction": "CreateFailoverCluster.ps1\\CreateFailoverCluster"
-        }
-    },
+				"sql1AddressNameWithSuffix": "[substring(concat(variables('sql1AddressName'), uniqueString(parameters('sqlStorageAccountName'),parameters('dcStorageAccountName'))),0,15)]",
+					"sql0AddressNameWithSuffix": "[substring(concat(variables('sql0AddressName'), uniqueString(parameters('sqlStorageAccountName'),parameters('dcStorageAccountName'))),0,15)]",
+					"loadBalancer2Name": "Intlb",
+				"publicIPAddressName": "PubliclbIP",
+				"loadBalancer1Name": "Extlb",
+				"loadBalancer3Name": "HWBrokerlb",
+				"lbSettings": {
+						"rdpLBFE": "rdpLBFE",
+						"sqlLBFE": "sqlLBFE",
+						"adLBBE": "adLBBE",
+						"sqlLBBE": "sqlLBBE",
+						"rdpLBName": "rdpLoadBalancer",
+						"sqlLBName": "sqlLoadBalancer"
+						},
+				"SQLAOProbe": "SQLAlwaysOnEndPointProbe",
+				"sql1AddressName": "sql1IP",
+					"sql0AddressName": "sql0IP",
+				"vmSettings": {
+					"availabilitySets": {
+						"sqlAvailabilitySetName": "sqlAvailabilitySet"
+					  },
+					"noOfSqlVMs": 2,
+					"vmContainerName": "vhds",
+					"sqlVMName": "sqlserver-",
+					"sqlwVMName": "cluster-fsw",
+					"windowsImagePublisher": "MicrosoftWindowsServer",
+					"windowsImageOffer": "WindowsServer",
+					"windowsImageSKU": "2019-datacenter-smalldisk-g2",
+					"sqlImagePublisher": "MicrosoftSQLServer",
+					"sqlImageOffer": "[parameters('sqlServerVersion')]",
+					"rdpPort": 3389,
+					"windowsDiskSize": 128,
+					"sqlDiskSize": 100
+						},
+				"sqlAOEPName": "[concat(parameters('deploymentPrefix'),'-hadr')]",
+				"sharePath": "[concat(parameters('deploymentPrefix'),'-fsw')]",
+				"clusterName": "[concat(parameters('deploymentPrefix'),'-fc')]",
+				"sqlwNicName": "[concat(variables('vmSettings').sqlwVMName,'-nic')]",		
+				"loadBalancer4Name": "SQLIntlb",
+				"networkInterface1Name": "HSWebNic",
+				"networkInterface2Name": "HSMgmtNic",
+				"networkInterface3Name": "HWBrokerNic",
+				"networkInterface4Name": "HWControlNic",
+				"networkInterface5Name": "ADDCNic",
+				"networkInterface6Name": "SQLNic",
+				"networkInterface7Name": [
+						"MSVDINic",
+						"DVDINic",
+						"SHDNic"
+					],	
+				"networkInterface8Name": "ARSNic",
+				"networkInterface9Name": [
+						"ADPDCNic",
+						"ADBDCNic"
+					],
+				"vmName": [
+						"HQPDC",
+						"HQBDC"
+						],
+				"ipAddress": [
+						"172.16.1.4",
+						"172.16.1.5"
+					],
+				"vnetTemplateUri": "[uri(parameters('_artifactsLocation'), concat('nestedtemplates/vnet.json', parameters('_artifactsLocationSasToken')))]",
+				"nicTemplateUri": "[uri(parameters('_artifactsLocation'), concat('nestedtemplates/nic.json', parameters('_artifactsLocationSasToken')))]",
+				"subnet1Ref": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('virtualNetworkName'), variables('subnet1Name'))]",
+				"subnet2Ref": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('virtualNetworkName'), variables('subnet2Name'))]",
+				"subnet3Ref": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('virtualNetworkName'), variables('subnet3Name'))]",
+				"subnet4Ref": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('virtualNetworkName'), variables('subnet4Name'))]",
+				"subnet5Ref": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('virtualNetworkName'), variables('subnet5Name'))]",
+				"subnet6Ref": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('virtualNetworkName'), variables('subnet6Name'))]",
+				"subnet7Ref": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('virtualNetworkName'), variables('subnet7Name'))]",
+				"subnet8Ref": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('virtualNetworkName'), variables('subnet8Name'))]",
+				"subnet9Ref": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('virtualNetworkName'), variables('subnet9Name'))]",
+				"subnet10Ref": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('virtualNetworkName'), variables('subnet10Name'))]",
+				"subnet11Ref": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('virtualNetworkName'), variables('subnet11Name'))]",
+				"derivedIds": {
+						"sqlBEAddressPoolID": "[resourceId('Microsoft.Network/loadBalancers/backendAddressPools',variables('lbSettings').sqlLBName,variables('lbSettings').sqlLBBE)]",
+						"sqllbFEConfigID": "[resourceId('Microsoft.Network/loadBalancers/frontendIPConfigurations',variables('lbSettings').sqlLBName,variables('lbSettings').sqlLBFE)]",
+						"sqllbProbeID": "[resourceId('Microsoft.Network/loadBalancers/probes',variables('lbSettings').sqlLBName,variables('SQLAOProbe'))]"
+						},
+				"networkSecurityGroup1Name": "HySecure-Web-NSG",
+				"networkSecurityGroup2Name": "HySecure-Mgmt-NSG",
+				"networkSecurityGroup3Name": "HyWorks-Broker-NSG",
+				"networkSecurityGroup4Name": "HyWorks-Controller-NSG",
+				"networkSecurityGroup5Name": "ADDS-NSG",
+				"networkSecurityGroup6Name": "SQL-NSG",
+				"networkSecurityGroup7Name": "VDI-NSG",
+				"networkSecurityGroup8Name": "ARS-NSG",
+				"SQL2012SP2-WS2012R2": "Enterprise",
+					"SQL2012SP3-WS2012R2": "Enterprise",
+					"SQL2014-WS2012R2": "Enterprise",
+					"SQL2014SP2-WS2012R2": "Enterprise",
+					"SQL2016-WS2012R2": "Enterprise",
+					"SQL2017-WS2016": "Enterprise",
+					"sql2019-ws2019": "Enterprise",
+					"sql2019-ws2022": "Enterprise",
+					"Monday": true,
+					"Tuesday": true,
+					"Wednesday": true,
+					"Thursday": true,
+					"Friday": true,
+					"Saturday": true,
+					"Sunday": true,
+					"Never": false,
+					"Everyday": true,
+					"numberOfHySecureMgmtInstances": 1,
+				"numberOfHyWorksControllerInstances": 1,
+				"numberOfADDSInstances": 2,
+				"numberOfSQLInstances": 2,
+				"numberOfARSMasterInstances": 1,
+				"numberOfARSDataInstances": 1,
+				"numberOfGoldInstances": 1,
+				"numberOfInstances" : 2,
+				"domainJoinOptions": 3,
+				"vmListArray": "[split(parameters('vmList'),',')]",
+				"configuration": {
+						"vnetwithDNSTemplateURL": "[uri(parameters('_artifactsLocation'), concat('nested/vnet-with-dns-server.json', parameters('_artifactsLocationSasToken')))]",
+						"nicTemplateURL": "[uri(parameters('_artifactsLocation'), concat('nested/nic.json', parameters('_artifactsLocationSasToken')))]",
+						"rdpIPAdressSetupURL": "[uri(parameters('_artifactsLocation'), concat('nested/publicip-rdp.json', parameters('_artifactsLocationSasToken')))]",
+						"setupLBsUrl": "[uri(parameters('_artifactsLocation'), concat('nested/setupLBs.json', parameters('_artifactsLocationSasToken')))]",
+						"creatingNicsUrl": "[uri(parameters('_artifactsLocation'), concat('nested/creatingNICS.json', parameters('_artifactsLocationSasToken')))]",
+						"storageAccountVirtualNetworkPublicIP": "[uri(parameters('_artifactsLocation'), concat('nested/storageAccountVirtualNetworkPublicIP.json', parameters('_artifactsLocationSasToken')))]",
+						"provisioningVMs": "[uri(parameters('_artifactsLocation'), concat('nested/provisioningVM', parameters('numberOfSqlVMDisks'),'.json', parameters('_artifactsLocationSasToken')))]",
+						"configuringBackupADVM": "[uri(parameters('_artifactsLocation'), concat('nested/configuringBackupADVM.json', parameters('_artifactsLocationSasToken')))]",
+						"preparingAlwaysOnSqlServer": "[uri(parameters('_artifactsLocation'), concat('nested/preparingSqlServer.json', parameters('_artifactsLocationSasToken')))]",
+						"configuringAlwaysOn": "[uri(parameters('_artifactsLocation'), concat('nested/configuringAlwaysOn.json', parameters('_artifactsLocationSasToken')))]",
+						"adPDCModulesURL": "[uri(parameters('_artifactsLocation'), concat('scripts/CreateADPDC.ps1.zip', parameters('_artifactsLocationSasToken')))]",
+						"adPDCConfigurationFunction": "CreateADPDC.ps1\\CreateADPDC",
+						"adBDCModulesURL": "[uri(parameters('_artifactsLocation'), concat('scripts/CreateADBDC.ps1.zip', parameters('_artifactsLocationSasToken')))]",
+						"adBDCConfigurationFunction": "CreateADBDC.ps1\\CreateADBDC",
+						"fswModulesURL": "[uri(parameters('_artifactsLocation'), concat('scripts/CreateFileShareWitness.ps1.zip', parameters('_artifactsLocationSasToken')))]",
+						"fswConfigurationFunction": "CreateFileShareWitness.ps1\\CreateFileShareWitness",
+						"sqlAOPrepareModulesURL": "[uri(parameters('_artifactsLocation'), concat('scripts/PrepareAlwaysOnSqlServer.ps1.zip', parameters('_artifactsLocationSasToken')))]",
+						"sqlAOPrepareConfigurationFunction": "PrepareAlwaysOnSqlServer.ps1\\PrepareAlwaysOnSqlServer",
+						"createClusterModulesURL": "[uri(parameters('_artifactsLocation'), concat('scripts/CreateFailoverCluster.ps1.zip', parameters('_artifactsLocationSasToken')))]",
+						"createClusterConfigurationFunction": "CreateFailoverCluster.ps1\\CreateFailoverCluster"
+					}
+				},
 	
     "resources": [
         {
@@ -2297,13 +2311,12 @@
 				}
             }
         },
-		/*
         {
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "2020-10-01",
             "name": "UpdatingDNStoPrimaryADVM",
             "dependsOn": [
-                "[resourceId('Microsoft.Compute/virtualMachines/extensions', variables('vmName')[0], 'InstallDomainController')]"
+                "[resourceId('Microsoft.Compute/virtualMachines/extensions', variables('vmName')[0], '/InstallDomainController')]"
             ],
             "properties": {
                 "mode": "Incremental",
@@ -2331,14 +2344,14 @@
                     }
                 }
             }
-        },*/
+        },
 		
 		{
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "2020-10-01",
             "name": "UpdatingDNStoBDCNIC",
             "dependsOn": [
-                "[resourceId('Microsoft.Compute/virtualMachines/extensions', variables('vmName')[0], 'InstallDomainController')]"
+                "[resourceId('Microsoft.Compute/virtualMachines/extensions', variables('vmName')[0], '/InstallDomainController')]"
             ],
 				"properties": {
 					"mode": "Incremental",
@@ -2380,7 +2393,7 @@
 		  "type": "Microsoft.Resources/deployments",
 		  "apiVersion": "2020-10-01",
 		  "dependsOn": [
-			"[resourceId('Microsoft.Compute/virtualMachines/extensions', variables('vmName')[0], 'InstallDomainController')]"
+			"[resourceId('Microsoft.Compute/virtualMachines/extensions', variables('vmName')[0], '/InstallDomainController')]"
 		  ],
 		  "properties": {
 			"mode": "Incremental",
@@ -2748,7 +2761,7 @@
 		 "comments": "Join domain - JsonADDomainExtension",
 		 "apiVersion": "2021-03-01",
 		 "type": "Microsoft.Compute/virtualMachines/extensions",
-		 "name": "[concat(trim(variables('vmListArray')[copyIndex()]),'/joindomain')]",
+		 "name": "[concat(trim(variables('vmListArray')[copyIndex()]),'joindomain')]",
 		 "dependsOn": [
 					"Microsoft.Resources/deployments/UpdatingDNSwithBackupADVM"
 					],
@@ -2764,10 +2777,10 @@
 					"autoUpgradeMinorVersion": true,
 					"settings": {
 					  "Name": "[parameters('domainName')]",
-					  "User": "[parameters('adminUsername')]",
+					  "User": "[format('{0}\\{1}', parameters('domainName'), parameters('adminUsername'))]",
 					  "Restart": "true",
 					  "Options": "[variables('domainJoinOptions')]"
-					  /*"OUPath": "[parameters('ouPath')]"*/
+					  "OUPath": "[parameters('ouPath')]"
 								},
 					"protectedSettings": {
 						"items": {
