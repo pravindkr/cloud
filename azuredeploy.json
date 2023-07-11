@@ -2755,8 +2755,8 @@
                     }
                 }
             }
-        },
-		
+        }
+		/*
 		{
 		 "comments": "Join domain - JsonADDomainExtension",
 		 "apiVersion": "2021-03-01",
@@ -2788,7 +2788,7 @@
 							}
 						}
 				}
-		}
+		}*/
     ],
     "outputs": {}
 }
