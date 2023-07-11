@@ -2283,7 +2283,7 @@
         {
             "type": "Microsoft.Compute/virtualMachines/extensions",
             "apiVersion": "2022-03-01",
-            "name": "[concat(variables('vmName')[0],'/InstallDomainController')]",
+            "name": "[concat(variables('vmName')[0], '/InstallDomainController')]",
             "location": "[parameters('location')]",
             "dependsOn": [
                 "vmLoop"
