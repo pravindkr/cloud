@@ -486,7 +486,7 @@
 		  "metadata": {
 			"description": "List of virtual machines to be domain joined, if using multiple VMs, make their names comma separate. E.g. VM01, VM02, VM03."
 		  }
-		}
+		},
 		"ouPath": {
 		  "type": "string",
 		  "defaultValue": "CN=Computers,DC=accops; DC=local",
@@ -2761,7 +2761,7 @@
 		 "comments": "Join domain - JsonADDomainExtension",
 		 "apiVersion": "2021-03-01",
 		 "type": "Microsoft.Compute/virtualMachines/extensions",
-		 "name": "[concat(trim(variables('vmListArray')[copyIndex()]),'joindomain')]",
+		 "name": "[concat(trim(variables('vmListArray')[copyIndex()]), 'joindomain')]",
 		 "dependsOn": [
 					"Microsoft.Resources/deployments/UpdatingDNSwithBackupADVM"
 					],
@@ -2779,7 +2779,7 @@
 					  "Name": "[parameters('domainName')]",
 					  "User": "[format('{0}\\{1}', parameters('domainName'), parameters('adminUsername'))]",
 					  "Restart": "true",
-					  "Options": "[variables('domainJoinOptions')]"
+					  "Options": "[variables('domainJoinOptions')]",
 					  "OUPath": "[parameters('ouPath')]"
 								},
 					"protectedSettings": {
