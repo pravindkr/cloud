@@ -3,19 +3,19 @@
   "contentVersion": "1.0.0.0",
   "parameters": {
     "adminUsername": {
-      "value": "GEN-UNIQUE"
+      "value": "accopsadmin"
     },
     "adminPassword": {
-      "value": "GEN-PASSWORD"
+      "value": ""
     },
     "dnsPrefix": {
       "value": "GEN-UNIQUE-8"
     },
     "domainName": {
-      "value": "mydomain.local"
+      "value": "accops.local"
     },
     "location": {
-      "value": "westus2"
+      "value": "centralindia"
     }
   }
 }

@@ -475,7 +475,7 @@
 		},
 		"ouPath": {
 		  "type": "string",
-		  "defaultValue": "CN=Computers,DC=accops; DC=local",
+		  "defaultValue": "DC=accops; DC=local",
 		  "metadata": {
 			"description": "Specifies an organizational unit (OU) for the domain account. Enter the full distinguished name of the OU in quotation marks. Example: \"OU=testOU; DC=domain; DC=Domain; DC=com\""
 		  }
@@ -1082,12 +1082,19 @@
                         "172.16.0.0/16"
                     ]
                 },
+				"dhcpOptions": {
+                    "dnsServers": [
+                        "[variables('ipAddress')[0]]",
+                        "[variables('ipAddress')[1]]"
+                    ]
+                },
                 "subnets": [
                     {
                         "name": "[variables('subnet9Name')]",
                         "properties": {
                             "addressPrefix": "172.16.0.0/26"
-                        }
+                        },
+						"type": "Microsoft.Network/virtualNetworks/subnets"
                     },
 					                    {
                         "name": "[variables('subnet10Name')]",
@@ -2304,7 +2311,7 @@
             "name": "[concat(variables('vmName')[1], '/CreateBDC')]",
             "location": "[parameters('location')]",
             "dependsOn": [
-                "[resourceId('Microsoft.Compute/virtualMachines/extensions', variables('vmName')[0], 'InstallDomainController')]"
+                "[resourceId('Microsoft.Compute/virtualMachines/extensions', variables('vmName')[0], '/InstallDomainController')]"
             ],
             "properties": {
                 "autoUpgradeMinorVersion": true,
@@ -2330,7 +2337,7 @@
             "apiVersion": "2020-10-01",
             "name": "UpdatingDNStoPrimaryADVM",
             "dependsOn": [
-                "[resourceId('Microsoft.Compute/virtualMachines/extensions', variables('vmName')[1], 'CreateBDC')]"
+                "[resourceId('Microsoft.Compute/virtualMachines/extensions', variables('vmName')[0], 'InstallDomainController')]"
             ],
             "properties": {
                 "mode": "Incremental",
