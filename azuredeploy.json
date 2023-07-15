@@ -1081,13 +1081,7 @@
                     "addressPrefixes": [
                         "172.16.0.0/16"
                     ]
-                },
-				"dhcpOptions": {
-                    "dnsServers": [
-                        "[variables('ipAddress')[0]]",
-                        "[variables('ipAddress')[1]]"
-                    ]
-                },
+                }, 
                 "subnets": [
                     {
                         "name": "[variables('subnet9Name')]",
@@ -2275,7 +2269,7 @@
 
         {
             "type": "Microsoft.Compute/virtualMachines/extensions",
-            "apiVersion": "2023-03-01",
+            "apiVersion": "2022-11-01",
             "name": "[concat(variables('vmName')[0], '/InstallDomainController')]",
             "location": "[parameters('location')]",
             "dependsOn": [
@@ -2304,14 +2298,56 @@
 				}
             }
         },
-		
-		{
+
+        {
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2020-10-01",
+            "name": "UpdatingADBVMNic",
+            "dependsOn": [
+                "[resourceId('Microsoft.Compute/virtualMachines/extensions', variables('vmName')[0], 'InstallDomainController')]"
+            ],
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[variables('configuration').nicTemplateURL]",
+                    "contentVersion": "1.0.0.0"
+                },
+                "parameters": {
+                    "location": {
+                        "value": "[parameters('location')]"
+                    },
+                    "nicName": {
+                        "value": "[variables('networkInterface9Name')[1]]"
+                    },
+                    "ipConfigurations": {
+                        "value": [
+                            {
+                                "name": "ipconfig1",
+                                "properties": {
+                                    "privateIPAllocationMethod": "Dynamic",
+                                    "subnet": {
+                                        "id": "[variables('subnet5Ref')]"
+                                    }
+                                }
+                            }
+                        ]
+                    },
+                    "dnsServers": {
+                        "value": [
+                            "[variables('ipAddress')[0]]"
+                        ]
+                    }
+                }
+            }
+        },
+
+        {
             "type": "Microsoft.Compute/virtualMachines/extensions",
-            "apiVersion": "2023-03-01",
+            "apiVersion": "2022-11-01",
             "name": "[concat(variables('vmName')[1], '/CreateBDC')]",
             "location": "[parameters('location')]",
             "dependsOn": [
-                "[resourceId('Microsoft.Compute/virtualMachines/extensions', variables('vmName')[0], '/InstallDomainController')]"
+                "Microsoft.Resources/deployments/UpdatingADBVMNic"
             ],
             "properties": {
                 "autoUpgradeMinorVersion": true,
@@ -2332,12 +2368,14 @@
                 "protectedSettings": {}
             }
         },
+
+              
         {
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "2020-10-01",
-            "name": "UpdatingDNStoPrimaryADVM",
+            "name": "UpdatingDNStoVNET",
             "dependsOn": [
-                "[resourceId('Microsoft.Compute/virtualMachines/extensions', variables('vmName')[0], 'InstallDomainController')]"
+                "[resourceId('Microsoft.Compute/virtualMachines/extensions', variables('vmName')[1], 'CreateBDC')]"
             ],
             "properties": {
                 "mode": "Incremental",
@@ -2360,7 +2398,8 @@
                     },
                     "DNSServerAddress": {
                         "value": [
-                            "[variables('ipAddress')[0]]"
+                            "[variables('ipAddress')[0]]",
+                            "[variables('ipAddress')[1]]"
                         ]
                     }
                 }
